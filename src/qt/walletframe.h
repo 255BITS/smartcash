@@ -1,7 +1,9 @@
-// Copyright (c) 2011-2013 The Bitcoin developers
-// Distributed under the MIT/X11 software license, see the accompanying
-// file COPYING or http://www.opensource.org/licenses/mit-license.php.
-
+/*
+ * Qt4 bitcoin GUI.
+ *
+ * W.J. van der Laan 2011-2012
+ * The Bitcoin Developers 2011-2013
+ */
 #ifndef WALLETFRAME_H
 #define WALLETFRAME_H
 
@@ -11,14 +13,12 @@ class BitcoinGUI;
 class ClientModel;
 class WalletModel;
 class WalletStack;
-class WalletView;
 
 class WalletFrame : public QFrame
 {
     Q_OBJECT
-
 public:
-    explicit WalletFrame(BitcoinGUI *_gui = 0);
+    explicit WalletFrame(BitcoinGUI *_gui);
     ~WalletFrame();
 
     void setClientModel(ClientModel *clientModel);
@@ -37,8 +37,6 @@ private:
     ClientModel *clientModel;
     WalletStack *walletStack;
 
-    WalletView *currentWalletView();
-
 public slots:
     /** Switch to overview (home) page */
     void gotoOverviewPage();
@@ -48,8 +46,6 @@ public slots:
     void gotoAddressBookPage();
     /** Switch to receive coins page */
     void gotoReceiveCoinsPage();
-    /** Switch to zerocoin page */
-    void gotoZerocoinPage();
     /** Switch to send coins page */
     void gotoSendCoinsPage(QString addr = "");
 

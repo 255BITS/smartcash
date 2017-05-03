@@ -1,7 +1,3 @@
-// Copyright (c) 2011-2013 The Bitcoin developers
-// Distributed under the MIT/X11 software license, see the accompanying
-// file COPYING or http://www.opensource.org/licenses/mit-license.php.
-
 #include "addressbookpage.h"
 #include "ui_addressbookpage.h"
 
@@ -20,7 +16,6 @@
 #include <QClipboard>
 #include <QMessageBox>
 #include <QMenu>
-
 
 AddressBookPage::AddressBookPage(Mode mode, Tabs tab, QWidget *parent) :
     QDialog(parent),
@@ -51,7 +46,7 @@ AddressBookPage::AddressBookPage(Mode mode, Tabs tab, QWidget *parent) :
         connect(ui->tableView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(accept()));
         ui->tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
         ui->tableView->setFocus();
-        ui->exportButton->hide();     
+        ui->exportButton->hide();
         break;
     case ForEditing:
         ui->buttonBox->setVisible(false);
@@ -60,37 +55,15 @@ AddressBookPage::AddressBookPage(Mode mode, Tabs tab, QWidget *parent) :
     switch(tab)
     {
     case SendingTab:
-        ui->labelExplanation->setText(tr("These are your SmartCash addresses for sending payments. Always check the amount and the receiving address before sending coins."));
+        ui->labelExplanation->setText(tr("These are your Bitcoin addresses for sending payments. Always check the amount and the receiving address before sending coins."));
         ui->deleteAddress->setVisible(true);
         ui->signMessage->setVisible(false);
-        ui->zerocoinAmount->setVisible(false);
-        ui->zerocoinMintButton->setVisible(false);
-        ui->zerocoinSpendButton->setVisible(false);
         break;
     case ReceivingTab:
-        ui->labelExplanation->setText(tr("These are your SmartCash addresses for receiving payments. You may want to give a different one to each sender so you can keep track of who is paying you."));
+        ui->labelExplanation->setText(tr("These are your Bitcoin addresses for receiving payments. You may want to give a different one to each sender so you can keep track of who is paying you."));
         ui->deleteAddress->setVisible(false);
         ui->signMessage->setVisible(true);
-        ui->zerocoinAmount->setVisible(false);
-        ui->zerocoinMintButton->setVisible(false);
-        ui->zerocoinSpendButton->setVisible(false);
         break;
-    case ZerocoinTab:
-        ui->labelExplanation->setText(tr("These are your private coins from the Renew SmartCash operation.  Two inputs of the same size are required before you can redeem by selecting Spend SmartCash."));
-        ui->deleteAddress->setVisible(false);
-        ui->signMessage->setVisible(false);
-        ui->newAddress->setVisible(false);
-        ui->copyAddress->setVisible(false);
-        ui->verifyMessage->setVisible(false);
-        ui->zerocoinAmount->setVisible(true);
-        ui->zerocoinMintButton->setVisible(true);
-        ui->zerocoinSpendButton->setVisible(true);
-        ui->zerocoinAmount->addItem("100");
-        ui->zerocoinAmount->addItem("1000");
-        ui->zerocoinAmount->addItem("10000");
-        ui->zerocoinAmount->addItem("100000");
-        ui->zerocoinAmount->addItem("1000000");
-
     }
 
     // Context menu actions
@@ -107,11 +80,7 @@ AddressBookPage::AddressBookPage(Mode mode, Tabs tab, QWidget *parent) :
     contextMenu = new QMenu();
     contextMenu->addAction(copyAddressAction);
     contextMenu->addAction(copyLabelAction);
-
-    if(tab != ZerocoinTab){
-        contextMenu->addAction(editAction);
-    }
-
+    contextMenu->addAction(editAction);
     if(tab == SendingTab)
         contextMenu->addAction(deleteAction);
     contextMenu->addSeparator();
@@ -169,24 +138,13 @@ void AddressBookPage::setModel(AddressTableModel *model)
         proxyModel->setFilterRole(AddressTableModel::TypeRole);
         proxyModel->setFilterFixedString(AddressTableModel::Send);
         break;
-    case ZerocoinTab:
-        // Zerocoin filter
-        proxyModel->setFilterRole(AddressTableModel::TypeRole);
-        proxyModel->setFilterFixedString(AddressTableModel::Zerocoin);
-        break;
-
     }
     ui->tableView->setModel(proxyModel);
     ui->tableView->sortByColumn(0, Qt::AscendingOrder);
 
     // Set column widths
-#if QT_VERSION < 0x050000
     ui->tableView->horizontalHeader()->setResizeMode(AddressTableModel::Label, QHeaderView::Stretch);
     ui->tableView->horizontalHeader()->setResizeMode(AddressTableModel::Address, QHeaderView::ResizeToContents);
-#else
-    ui->tableView->horizontalHeader()->setSectionResizeMode(AddressTableModel::Label, QHeaderView::Stretch);
-    ui->tableView->horizontalHeader()->setSectionResizeMode(AddressTableModel::Address, QHeaderView::ResizeToContents);
-#endif
 
     connect(ui->tableView->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
             this, SLOT(selectionChanged()));
@@ -229,34 +187,6 @@ void AddressBookPage::onEditAction()
     dlg.loadRow(origIndex.row());
     dlg.exec();
 }
-
-void AddressBookPage::on_zerocoinMintButton_clicked() {
-    QString amount = ui->zerocoinAmount->currentText();
-    std::string denomAmount = amount.toStdString();
-    std::string stringError;
-    if(!model->zerocoinMint(stringError, denomAmount)){
-        QString t = tr(stringError.c_str());
-
-        QMessageBox::critical(this, tr("Error"),
-            tr("You cannot Renew SmartCash because %1").arg(t),
-            QMessageBox::Ok, QMessageBox::Ok);
-    }
-
-}
-
-void AddressBookPage::on_zerocoinSpendButton_clicked() {
-    QString amount = ui->zerocoinAmount->currentText();
-    std::string denomAmount = amount.toStdString();
-    std::string stringError;
-    if(!model->zerocoinSpend(stringError, denomAmount)){
-        QString t = tr(stringError.c_str());
-
-        QMessageBox::critical(this, tr("Error"),
-            tr("You cannot spend zerocoin because %1").arg(t),
-            QMessageBox::Ok, QMessageBox::Ok);
-    }
-}
-
 
 void AddressBookPage::on_signMessage_clicked()
 {
@@ -353,8 +283,6 @@ void AddressBookPage::selectionChanged()
             ui->signMessage->setVisible(true);
             ui->verifyMessage->setEnabled(false);
             ui->verifyMessage->setVisible(false);
-            break;
-        case ZerocoinTab:
             break;
         }
         ui->copyAddress->setEnabled(true);

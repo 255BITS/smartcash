@@ -1,7 +1,9 @@
-// Copyright (c) 2011-2013 The Bitcoin developers
-// Distributed under the MIT/X11 software license, see the accompanying
-// file COPYING or http://www.opensource.org/licenses/mit-license.php.
-
+/*
+ * Qt4 bitcoin GUI.
+ *
+ * W.J. van der Laan 2011-2012
+ * The Bitcoin Developers 2011-2013
+ */
 #include "walletview.h"
 #include "bitcoingui.h"
 #include "transactiontablemodel.h"
@@ -19,11 +21,7 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QAction>
-#if QT_VERSION < 0x050000
 #include <QDesktopServices>
-#else
-#include <QStandardPaths>
-#endif
 #include <QFileDialog>
 #include <QPushButton>
 
@@ -55,8 +53,6 @@ WalletView::WalletView(QWidget *parent, BitcoinGUI *_gui):
 
     receiveCoinsPage = new AddressBookPage(AddressBookPage::ForEditing, AddressBookPage::ReceivingTab);
 
-    zerocoinPage = new AddressBookPage(AddressBookPage::ForEditing, AddressBookPage::ZerocoinTab);
-
     sendCoinsPage = new SendCoinsDialog(gui);
 
     signVerifyMessageDialog = new SignVerifyMessageDialog(gui);
@@ -66,7 +62,6 @@ WalletView::WalletView(QWidget *parent, BitcoinGUI *_gui):
     addWidget(addressBookPage);
     addWidget(receiveCoinsPage);
     addWidget(sendCoinsPage);
-    addWidget(zerocoinPage);
 
     // Clicking on a transaction on the overview page simply sends you to transaction history page
     connect(overviewPage, SIGNAL(transactionClicked(QModelIndex)), this, SLOT(gotoHistoryPage()));
@@ -104,7 +99,6 @@ void WalletView::setClientModel(ClientModel *clientModel)
         overviewPage->setClientModel(clientModel);
         addressBookPage->setOptionsModel(clientModel->getOptionsModel());
         receiveCoinsPage->setOptionsModel(clientModel->getOptionsModel());
-        zerocoinPage->setOptionsModel(clientModel->getOptionsModel());
     }
 }
 
@@ -121,7 +115,6 @@ void WalletView::setWalletModel(WalletModel *walletModel)
         overviewPage->setWalletModel(walletModel);
         addressBookPage->setModel(walletModel->getAddressTableModel());
         receiveCoinsPage->setModel(walletModel->getAddressTableModel());
-        zerocoinPage->setModel(walletModel->getAddressTableModel());
         sendCoinsPage->setModel(walletModel);
         signVerifyMessageDialog->setModel(walletModel);
 
@@ -176,13 +169,6 @@ void WalletView::gotoReceiveCoinsPage()
     gui->getReceiveCoinsAction()->setChecked(true);
     setCurrentWidget(receiveCoinsPage);
 }
-
-void WalletView::gotoZerocoinPage()
-{
-    gui->getZerocoinAction()->setChecked(true);
-    setCurrentWidget(zerocoinPage);
-}
-
 
 void WalletView::gotoSendCoinsPage(QString addr)
 {
@@ -247,11 +233,7 @@ void WalletView::encryptWallet(bool status)
 
 void WalletView::backupWallet()
 {
-#if QT_VERSION < 0x050000
     QString saveDir = QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation);
-#else
-    QString saveDir = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
-#endif
     QString filename = QFileDialog::getSaveFileName(this, tr("Backup Wallet"), saveDir, tr("Wallet Data (*.dat)"));
     if (!filename.isEmpty()) {
         if (!walletModel->backupWallet(filename)) {

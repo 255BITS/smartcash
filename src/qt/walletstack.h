@@ -40,7 +40,6 @@ QT_END_NAMESPACE
 class WalletStack : public QStackedWidget
 {
     Q_OBJECT
-
 public:
     explicit WalletStack(QWidget *parent = 0);
     ~WalletStack();
@@ -76,8 +75,6 @@ public slots:
     void gotoAddressBookPage();
     /** Switch to receive coins page */
     void gotoReceiveCoinsPage();
-    /** Switch to zerocoin page */
-    void gotoZerocoinPage();
     /** Switch to send coins page */
     void gotoSendCoinsPage(QString addr = "");
 
