@@ -14,7 +14,8 @@
 #include "Lyra2Z/Lyra2.h"
 #include "libzerocoin/Zerocoin.h"
 #include "db.h"
-
+#include "mtp.h"
+// mtp.h might not be needed
 #include <list>
 
 class CWallet;
@@ -67,6 +68,9 @@ static const int COINBASE_MATURITY = 100;
 static const unsigned int LOCKTIME_THRESHOLD = 500000000; // Tue Nov  5 00:53:20 1985 UTC
 /** Maximum number of script-checking threads allowed */
 static const int MAX_SCRIPTCHECK_THREADS = 16;
+static const int HF_MTP_HEIGHT = 60;
+static const int HF_MTP_HEIGHT_TESTNET = 60;
+
 #ifdef USE_UPNP
 static const int fHaveUPnP = true;
 #else
@@ -1365,7 +1369,9 @@ public:
     uint256 GetPoWHash(int height) const
     {
         uint256 thash;
-
+//            mtp_hash(BEGIN(thash), BEGIN(pblock->nVersion), d_mtp, pblock);
+//            printf("Found MTP hash: %s\n", thash.GetHex().c_str());
+//	    mtp_verification = mtp_verifier(d_mtp, pblock);
             lyra2z_hash(BEGIN(nVersion), BEGIN(thash));
 /*
         if (!fTestNet && height >= 20500) {

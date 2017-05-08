@@ -18,13 +18,6 @@
 #include "fixed.h"
 #include <stdint.h>
 #include <emmintrin.h>
-#include "argon2/argon2.h"
-#include "argon2/core.h"
-#include "argon2/thread.h"
-#include "argon2/blake2/blake2.h"
-#include "argon2/blake2/blake2-impl.h"
-#include "argon2/blake2/blamka-round-opt.h"
-#include "merkletree/sha.h"
 
 using namespace std;
 using namespace boost;
@@ -94,8 +87,8 @@ int64 nHPSTimerStart = 0;
 int64 nTransactionFee = 0;
 int64 nMinimumInputValue = DUST_HARD_LIMIT;
 
-
-
+// security parameter d of MTP
+static unsigned int d_mtp = 1;
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -2390,8 +2383,8 @@ unsigned int static GetNextWorkRequired(const CBlockIndex* pindexLast, const CBl
     {
         return bnProofOfWorkLimit.GetCompact();
     }
-
-    return bnProofOfWorkLimit.GetCompact();
+//    Is this needed
+//    return bnProofOfWorkLimit.GetCompact();
 
     static const uint32_t        BlocksTargetSpacing                        = 55; // 10 minutes
         unsigned int                TimeDaySeconds                                = 60 * 60 * 24;
@@ -2429,6 +2422,12 @@ unsigned int static GetNextWorkRequired(const CBlockIndex* pindexLast, const CBl
         return bnNew.GetCompact();
     }
 */
+    // 04/09/2017 - Reset diff on testnet for MTP, 6 blocks look back
+    {		
+    if(fTestNet && pindexLast->nHeight + 1 >= HF_MTP_HEIGHT_TESTNET && pindexLast->nHeight + 1 <= HF_MTP_HEIGHT_TESTNET + 5) {
+        return bnProofOfWorkLimit.GetCompact();
+    }
+
    	if ((pindexLast->nHeight+1) % nInterval != 0) // Retarget every nInterval blocks
     {
         return pindexLast->nBits;
@@ -3519,7 +3518,7 @@ int GetOurChainID()
     return 0x0001; // We are the first :)
 
 }
-
+/*
 unsigned int trailing_zeros(char str[64]) {
     unsigned int i, d;
     d = 0;
@@ -3579,7 +3578,7 @@ void fill_block(__m128i *state, const block *ref_block, block *next_block,
         _mm_storeu_si128((__m128i *)next_block->v + i, state[i]);
     }
 }
-
+*/
 
 bool CBlockHeader::CheckProofOfWork(int nHeight) const
 {
@@ -3591,7 +3590,7 @@ bool CBlockHeader::CheckProofOfWork(int nHeight) const
         // - index of this chain in chain merkle tree must be pre-determined (see CAuxPow::Check)
         if (!fTestNet && nHeight != INT_MAX && GetChainID() != GetOurChainID())
             return error("CheckProofOfWork() : block does not have our chain ID");
-
+/*
         // Enable MTP
         // TODO: should we check block height and testnet or just version ?
         if (fTestNet && nHeight >= 40){
@@ -3723,8 +3722,21 @@ bool CBlockHeader::CheckProofOfWork(int nHeight) const
                     return ret;
                 }
             }
+*/
+if (auxpow.get() != NULL) {
+if (!auxpow->Check(GetHash(), GetChainID())) 
+return error("CheckProofOfWork() : AUX POW is not valid");
+// Check proof of work matches claimed amount
+if (!::CheckProofOfWork(auxpow->GetParentBlockHash(nHeight), nBits))
+return error("CheckProofOfWork() : AUX proof of work failed");
+}
+else {
+// Check proof of work matches claimed amount
+if (!::CheckProofOfWork(GetPoWHash(nHeight), nBits))
+return error("CheckProofOfWork() : proof of work failed - 1");
 
 
+/*
             printf("Step 10 : Check Y(L) had d tralling zeros then agree\n");
             // Step 10 : Check Y(L) had d tralling zeros then agree
             char hex_tmp[64];
@@ -3756,10 +3768,11 @@ bool CBlockHeader::CheckProofOfWork(int nHeight) const
                 if (!::CheckProofOfWork(GetPoWHash(nHeight), nBits))
                     return error("CheckProofOfWork() : proof of work failed - 1");
             }
+*/
         }
     }
-    else
-    {
+    else {
+
         if (auxpow.get() != NULL)
         {
             return error("CheckProofOfWork() : AUX POW is not allowed at this block");
@@ -6672,7 +6685,7 @@ void static SmartcashMiner(CWallet *pwallet)
 
             printf("Running SmartcashMiner with %" PRIszu" transactions in block (%u bytes)\n", pblock->vtx.size(),
                    ::GetSerializeSize(*pblock, SER_NETWORK, PROTOCOL_VERSION));
-
+/*
             // Start Merkel Tree Proof of Work
             if((!fTestNet && pindexPrev->nHeight + 1 >= 30000)
                     || (fTestNet && pindexPrev->nHeight + 1 >= 40)){
@@ -6735,7 +6748,7 @@ void static SmartcashMiner(CWallet *pwallet)
 #undef TEST_ADLEN
 
                     printf("1. Validate all inputs \n");
-                    /* 1. Validate all inputs */
+//                     1. Validate all inputs 
                     int result = validate_inputs(&context);
                     uint32_t memory_blocks, segment_length;
                     argon2_instance_t instance;
@@ -6746,7 +6759,7 @@ void static SmartcashMiner(CWallet *pwallet)
 
                     printf("2. Align memory size \n");
                     /* 2. Align memory size */
-                    /* Minimum memory_blocks = 8L blocks, where L is the number of lanes */
+//                    /* Minimum memory_blocks = 8L blocks, where L is the number of lanes
                     memory_blocks = context.m_cost;
 
                     if (memory_blocks < 2 * ARGON2_SYNC_POINTS * context.lanes) {
@@ -6754,7 +6767,7 @@ void static SmartcashMiner(CWallet *pwallet)
                     }
 
                     segment_length = memory_blocks / (context.lanes * ARGON2_SYNC_POINTS);
-                    /* Ensure that all segments have equal length */
+                    /* Ensure that all segments have equal length 
                     memory_blocks = segment_length * (context.lanes * ARGON2_SYNC_POINTS);
 
                     instance.version = context.version;
@@ -6770,7 +6783,7 @@ void static SmartcashMiner(CWallet *pwallet)
                     printf("3. Initialization: Hashing inputs, allocating memory, filling first blocks\n");
                     /* 3. Initialization: Hashing inputs, allocating memory, filling first
                     * blocks
-                    */
+                    
                     result = initialize(&instance, &context);
 
                     if (ARGON2_OK != result) {
@@ -6779,7 +6792,7 @@ void static SmartcashMiner(CWallet *pwallet)
                     }
 
                     printf("4. Filling memory \n");
-                    /* 4. Filling memory */
+                    /* 4. Filling memory 
 
 
                     uint32_t r, s;
@@ -6787,7 +6800,7 @@ void static SmartcashMiner(CWallet *pwallet)
                     argon2_thread_data *thr_data = NULL;
                     int rc = ARGON2_OK;
 
-                    /* 1. Allocating space for threads */
+                    /* 1. Allocating space for threads 
                     thread = calloc(instance.lanes, sizeof(argon2_thread_handle_t));
                     if (thread == NULL) {
                         rc = ARGON2_MEMORY_ALLOCATION_ERROR;
@@ -6805,11 +6818,11 @@ void static SmartcashMiner(CWallet *pwallet)
                         for (s = 0; s < ARGON2_SYNC_POINTS; ++s) {
                             uint32_t l;
 
-                            /* 2. Calling threads */
+                            /* 2. Calling threads 
                             for (l = 0; l < instance.lanes; ++l) {
                                 argon2_position_t position;
 
-                                /* 2.1 Join a thread if limit is exceeded */
+                                /* 2.1 Join a thread if limit is exceeded 
                                 if (l >= instance.threads) {
                                     if (argon2_thread_join(thread[l - instance.threads])) {
                                         rc = ARGON2_THREAD_FAIL;
@@ -6817,13 +6830,13 @@ void static SmartcashMiner(CWallet *pwallet)
                                     }
                                 }
 
-                                /* 2.2 Create thread */
+                                /* 2.2 Create thread 
                                 position.pass = r;
                                 position.lane = l;
                                 position.slice = (uint8_t)s;
                                 position.index = 0;
                                 thr_data[l].instance_ptr =
-                                        &instance; /* preparing the thread input */
+                                        &instance; /* preparing the thread input 
                                 memcpy(&(thr_data[l].pos), &position,
                                        sizeof(argon2_position_t));
                                 if (argon2_thread_create(&thread[l], &fill_segment_thr,
@@ -6836,8 +6849,8 @@ void static SmartcashMiner(CWallet *pwallet)
                                 /*Non-thread equivalent of the lines above */
                             }
 
-                            /* 3. Joining remaining threads */
-                            for (l = instance.lanes - instance.threads; l < instance.lanes;
+                            /* 3. Joining remaining threads 
+                           for (l = instance.lanes - instance.threads; l < instance.lanes;
                                  ++l) {
                                 if (argon2_thread_join(thread[l])) {
                                     rc = ARGON2_THREAD_FAIL;
@@ -7130,7 +7143,7 @@ fail:
                     if(isFound) break;
                 }
             }else{
-
+*/
                 //
                 // Pre-build hash buffers
                 //
@@ -7144,7 +7157,6 @@ fail:
                 unsigned int& nBlockBits = *(unsigned int*)(pdata + 64 + 8);
                 //unsigned int& nBlockNonce = *(unsigned int*)(pdata + 64 + 12);
 
-
                 //
                 // Search
                 //
@@ -7157,7 +7169,13 @@ fail:
 
                     loop
 		    {
-                            lyra2z_hash(BEGIN(pblock->nVersion), BEGIN(thash));
+//                      lyra2z_hash(BEGIN(pblock->nVersion), BEGIN(thash));
+                        mtp_hash(BEGIN(thash), BEGIN(pblock->nVersion), d_mtp, pblock);
+                      	// TODO: compare with target
+			printf("Found MTP hash: %s\n", thash.GetHex().c_str());
+			// TODO: verification should be after checking with target
+			mtp_verification = mtp_verifier(d_mtp, pblock);
+
 /*
                     {
                         if ( (!fTestNet && pindexPrev->nHeight + 1 >= 20500) ) {
@@ -7178,8 +7196,8 @@ fail:
                             //printf("hashTarget: %s\n", hashTarget.ToString().c_str());
                         }
 */
-                        if (thash <= hashTarget)
-                        {
+                        if (thash <= hashTarget) || (mtp_verification)) {
+
                             // Found a solution
                             printf("Found a solution. Hash: %s", thash.GetHex().c_str());
                             SetThreadPriority(THREAD_PRIORITY_NORMAL);
@@ -7243,7 +7261,7 @@ fail:
                         hashTarget = CBigNum().SetCompact(pblock->nBits).getuint256();
                     }
                 }
-            }
+//          }
         }
     }
     catch (boost::thread_interrupted)
