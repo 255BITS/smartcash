@@ -1,9 +1,9 @@
-Building SmartCash
+Building Bitcoin
 
-See doc/readme-qt.rst for instructions on building smartcash,
+See doc/readme-qt.rst for instructions on building Bitcoin-Qt,
 the intended-for-end-users, nice-graphical-interface, reference
-implementation of smartcash.
+implementation of Bitcoin.
 
-See doc/build-*.txt for instructions on building smartcashd,
+See doc/build-*.txt for instructions on building bitcoind,
 the intended-for-services, no-graphical-interface, reference
-implementation of smartcash.
+implementation of Bitcoin.

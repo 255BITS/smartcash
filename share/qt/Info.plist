@@ -3,7 +3,7 @@
 <plist version="0.9">
 <dict>
 	<key>CFBundleIconFile</key>
-        <string>smartcash.icns</string>
+	<string>litecoin.icns</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleGetInfoString</key>
@@ -15,19 +15,19 @@
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleExecutable</key>
-        <string>smartcash-qt</string>
+	<string>Litecoin-Qt</string>
 	<key>CFBundleIdentifier</key>
-        <string>org.smartcash.smartcash-qt</string>
+	<string>org.litecoin.Litecoin-Qt</string>
         <key>CFBundleURLTypes</key>
         <array>
           <dict>
             <key>CFBundleTypeRole</key>
             <string>Editor</string>
             <key>CFBundleURLName</key>
-            <string>org.smartcash.SmartCashPayment</string>
+            <string>org.litecoin.LitecoinPayment</string>
             <key>CFBundleURLSchemes</key>
             <array>
-              <string>smartcash</string>
+              <string>litecoin</string>
             </array>
           </dict>
         </array>

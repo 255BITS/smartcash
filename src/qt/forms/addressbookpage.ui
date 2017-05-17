@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1686</width>
+    <width>760</width>
     <height>380</height>
    </rect>
   </property>
@@ -96,7 +96,7 @@
      <item>
       <widget class="QPushButton" name="signMessage">
        <property name="toolTip">
-        <string>Sign a message to prove you own a smartcash address</string>
+        <string>Sign a message to prove you own a Marxcoin address</string>
        </property>
        <property name="text">
         <string>Sign &amp;Message</string>
@@ -110,7 +110,7 @@
      <item>
       <widget class="QPushButton" name="verifyMessage">
        <property name="toolTip">
-        <string>Verify a message to ensure it was signed with a specified smartcash address</string>
+        <string>Verify a message to ensure it was signed with a specified Marxcoin address</string>
        </property>
        <property name="text">
         <string>&amp;Verify Message</string>
@@ -132,31 +132,6 @@
        <property name="icon">
         <iconset resource="../bitcoin.qrc">
          <normaloff>:/icons/remove</normaloff>:/icons/remove</iconset>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QComboBox" name="zerocoinAmount"/>
-     </item>
-     <item>
-      <widget class="QPushButton" name="zerocoinMintButton">
-       <property name="text">
-       <string>Renew SmartCash</string>
-       </property>
-       <property name="icon">
-        <iconset resource="../bitcoin.qrc">
-         <normaloff>:/icons/add</normaloff>:/icons/add</iconset>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="zerocoinSpendButton">
-       <property name="text">
-        <string>Spend SmartCash</string>
-       </property>
-       <property name="icon">
-        <iconset resource="../bitcoin.qrc">
-         <normaloff>:/icons/edit</normaloff>:/icons/edit</iconset>
        </property>
       </widget>
      </item>

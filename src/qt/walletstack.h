@@ -19,6 +19,7 @@ class WalletView;
 class TransactionView;
 class OverviewPage;
 class AddressBookPage;
+class MiningPage;
 class SendCoinsDialog;
 class SignVerifyMessageDialog;
 class Notificator;
@@ -40,7 +41,6 @@ QT_END_NAMESPACE
 class WalletStack : public QStackedWidget
 {
     Q_OBJECT
-
 public:
     explicit WalletStack(QWidget *parent = 0);
     ~WalletStack();
@@ -74,10 +74,9 @@ public slots:
     void gotoHistoryPage();
     /** Switch to address book page */
     void gotoAddressBookPage();
+    void gotoMiningPage();
     /** Switch to receive coins page */
     void gotoReceiveCoinsPage();
-    /** Switch to zerocoin page */
-    void gotoZerocoinPage();
     /** Switch to send coins page */
     void gotoSendCoinsPage(QString addr = "");
 

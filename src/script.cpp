@@ -16,7 +16,7 @@ using namespace boost;
 #include "sync.h"
 #include "util.h"
 
-bool CheckSig(vector<unsigned char> vchSig, const vector<unsigned char> &vchPubKey, const CScript &scriptCode, const CTransaction& txTo, unsigned int nIn, int nHashType, int flags);
+bool CheckSig(vector<unsigned char> vchSig, vector<unsigned char> vchPubKey, CScript scriptCode, const CTransaction& txTo, unsigned int nIn, int nHashType, int flags);
 
 
 
@@ -79,8 +79,6 @@ const char* GetTxnOutputType(txnouttype t)
     case TX_PUBKEYHASH: return "pubkeyhash";
     case TX_SCRIPTHASH: return "scripthash";
     case TX_MULTISIG: return "multisig";
-    case TX_NULL_DATA: return "nulldata";
-    case TX_ZEROCOINMINT: return "zerocoinmint";
     }
     return NULL;
 }
@@ -217,15 +215,12 @@ const char* GetOpName(opcodetype opcode)
     case OP_NOP9                   : return "OP_NOP9";
     case OP_NOP10                  : return "OP_NOP10";
 
-    // zerocoin
-    case OP_ZEROCOINMINT           : return "OP_ZEROCOINMINT";
-    case OP_ZEROCOINSPEND          : return "OP_ZEROCOINSPEND";
+
 
     // template matching params
     case OP_PUBKEYHASH             : return "OP_PUBKEYHASH";
     case OP_PUBKEY                 : return "OP_PUBKEY";
 
-    case OP_SMALLDATA              : return "OP_SMALLDATA";
     case OP_INVALIDOPCODE          : return "OP_INVALIDOPCODE";
     default:
         return "OP_UNKNOWN";
@@ -1038,13 +1033,13 @@ class CSignatureCache
 {
 private:
      // sigdata_type is (signature hash, signature, public key):
-    typedef boost::tuple<uint256, std::vector<unsigned char>, CPubKey> sigdata_type;
+    typedef boost::tuple<uint256, std::vector<unsigned char>, std::vector<unsigned char> > sigdata_type;
     std::set< sigdata_type> setValid;
     boost::shared_mutex cs_sigcache;
 
 public:
     bool
-    Get(const uint256 &hash, const std::vector<unsigned char>& vchSig, const CPubKey& pubKey)
+    Get(uint256 hash, const std::vector<unsigned char>& vchSig, const std::vector<unsigned char>& pubKey)
     {
         boost::shared_lock<boost::shared_mutex> lock(cs_sigcache);
 
@@ -1055,7 +1050,7 @@ public:
         return false;
     }
 
-    void Set(const uint256 &hash, const std::vector<unsigned char>& vchSig, const CPubKey& pubKey)
+    void Set(uint256 hash, const std::vector<unsigned char>& vchSig, const std::vector<unsigned char>& pubKey)
     {
         // DoS prevention: limit cache size to less than 10MB
         // (~200 bytes per cache entry times 50,000 entries)
@@ -1086,14 +1081,10 @@ public:
     }
 };
 
-bool CheckSig(vector<unsigned char> vchSig, const vector<unsigned char> &vchPubKey, const CScript &scriptCode,
+bool CheckSig(vector<unsigned char> vchSig, vector<unsigned char> vchPubKey, CScript scriptCode,
               const CTransaction& txTo, unsigned int nIn, int nHashType, int flags)
 {
     static CSignatureCache signatureCache;
-
-    CPubKey pubkey(vchPubKey);
-    if (!pubkey.IsValid())
-        return false;
 
     // Hash type is one byte tacked on to the end of the signature
     if (vchSig.empty())
@@ -1106,14 +1097,18 @@ bool CheckSig(vector<unsigned char> vchSig, const vector<unsigned char> &vchPubK
 
     uint256 sighash = SignatureHash(scriptCode, txTo, nIn, nHashType);
 
-    if (signatureCache.Get(sighash, vchSig, pubkey))
+    if (signatureCache.Get(sighash, vchSig, vchPubKey))
         return true;
 
-    if (!pubkey.Verify(sighash, vchSig))
+    CKey key;
+    if (!key.SetPubKey(vchPubKey))
+        return false;
+
+    if (!key.Verify(sighash, vchSig))
         return false;
 
     if (!(flags & SCRIPT_VERIFY_NOCACHE))
-        signatureCache.Set(sighash, vchSig, pubkey);
+        signatureCache.Set(sighash, vchSig, vchPubKey);
 
     return true;
 }
@@ -1132,7 +1127,7 @@ bool CheckSig(vector<unsigned char> vchSig, const vector<unsigned char> &vchPubK
 bool Solver(const CScript& scriptPubKey, txnouttype& typeRet, vector<vector<unsigned char> >& vSolutionsRet)
 {
     // Templates
-    static multimap<txnouttype, CScript> mTemplates;
+    static map<txnouttype, CScript> mTemplates;
     if (mTemplates.empty())
     {
         // Standard tx, sender provides pubkey, receiver adds signature
@@ -1143,11 +1138,6 @@ bool Solver(const CScript& scriptPubKey, txnouttype& typeRet, vector<vector<unsi
 
         // Sender provides N pubkeys, receivers provides M signatures
         mTemplates.insert(make_pair(TX_MULTISIG, CScript() << OP_SMALLINTEGER << OP_PUBKEYS << OP_SMALLINTEGER << OP_CHECKMULTISIG));
-
-        // Empty, provably prunable, data-carrying output
-        mTemplates.insert(make_pair(TX_NULL_DATA, CScript() << OP_RETURN << OP_SMALLDATA));
-        mTemplates.insert(make_pair(TX_NULL_DATA, CScript() << OP_RETURN));
-
     }
 
     // Shortcut for pay-to-script-hash, which are more constrained than the other types:
@@ -1156,16 +1146,6 @@ bool Solver(const CScript& scriptPubKey, txnouttype& typeRet, vector<vector<unsi
     {
         typeRet = TX_SCRIPTHASH;
         vector<unsigned char> hashBytes(scriptPubKey.begin()+2, scriptPubKey.begin()+22);
-        vSolutionsRet.push_back(hashBytes);
-        return true;
-    }
-
-    // Zerocoin
-    if (scriptPubKey.IsZerocoinMint())
-    {
-        typeRet = TX_ZEROCOINMINT;
-        if(scriptPubKey.size() > 150) return false;
-        vector<unsigned char> hashBytes(scriptPubKey.begin()+2, scriptPubKey.end());
         vSolutionsRet.push_back(hashBytes);
         return true;
     }
@@ -1242,12 +1222,6 @@ bool Solver(const CScript& scriptPubKey, txnouttype& typeRet, vector<vector<unsi
                 else
                     break;
             }
-            else if (opcode2 == OP_SMALLDATA)
-            {
-                // small pushdata, <= MAX_OP_RETURN_RELAY bytes
-                if (vch1.size() > MAX_OP_RETURN_RELAY)
-                    break;
-            }
             else if (opcode1 != opcode2 || vch1 != vch2)
             {
                 // Others must match exactly
@@ -1310,8 +1284,6 @@ bool Solver(const CKeyStore& keystore, const CScript& scriptPubKey, uint256 hash
     switch (whichTypeRet)
     {
     case TX_NONSTANDARD:
-    case TX_NULL_DATA:
-    case TX_ZEROCOINMINT:
         return false;
     case TX_PUBKEY:
         keyID = CPubKey(vSolutions[0]).GetID();
@@ -1342,8 +1314,6 @@ int ScriptSigArgsExpected(txnouttype t, const std::vector<std::vector<unsigned c
     switch (t)
     {
     case TX_NONSTANDARD:
-    case TX_NULL_DATA:
-    case TX_ZEROCOINMINT:
         return -1;
     case TX_PUBKEY:
         return 1;
@@ -1359,10 +1329,10 @@ int ScriptSigArgsExpected(txnouttype t, const std::vector<std::vector<unsigned c
     return -1;
 }
 
-bool IsStandard(const CScript& scriptPubKey, txnouttype& whichType)
+bool IsStandard(const CScript& scriptPubKey)
 {
     vector<valtype> vSolutions;
-    // txnouttype whichType;
+    txnouttype whichType;
     if (!Solver(scriptPubKey, whichType, vSolutions))
         return false;
 
@@ -1421,8 +1391,7 @@ bool IsMine(const CKeyStore &keystore, const CScript& scriptPubKey)
     switch (whichType)
     {
     case TX_NONSTANDARD:
-    case TX_NULL_DATA:
-    case TX_ZEROCOINMINT:
+        return false;
     case TX_PUBKEY:
         keyID = CPubKey(vSolutions[0]).GetID();
         return keystore.HaveKey(keyID);
@@ -1483,11 +1452,6 @@ bool ExtractDestinations(const CScript& scriptPubKey, txnouttype& typeRet, vecto
     vector<valtype> vSolutions;
     if (!Solver(scriptPubKey, typeRet, vSolutions))
         return false;
-
-    if (typeRet == TX_NULL_DATA){
-        // This is data, not addresses
-        return false;
-    }
 
     if (typeRet == TX_MULTISIG)
     {
@@ -1667,8 +1631,6 @@ static CScript CombineSignatures(CScript scriptPubKey, const CTransaction& txTo,
     switch (txType)
     {
     case TX_NONSTANDARD:
-    case TX_NULL_DATA:
-    case TX_ZEROCOINMINT:
         // Don't know anything about this, assume bigger one is correct:
         if (sigs1.size() >= sigs2.size())
             return PushAll(sigs1);
@@ -1778,46 +1740,6 @@ bool CScript::IsPayToScriptHash() const
             this->at(22) == OP_EQUAL);
 }
 
-bool CScript::IsZerocoinMint() const
-{
-    // Extra-fast test for Zerocoin Mint CScripts:
-    return (this->size() > 0 &&
-            this->at(0) == OP_ZEROCOINMINT);
-}
-
-bool CScript::IsZerocoinSpend() const
-{
-    return (this->size() > 0 &&
-            this->at(0) == OP_ZEROCOINSPEND);
-}
-
-bool CScript::HasCanonicalPushes() const
-{
-    const_iterator pc = begin();
-    while (pc < end())
-    {
-        opcodetype opcode;
-        std::vector<unsigned char> data;
-        if (!GetOp(pc, opcode, data))
-            return false;
-        if (opcode > OP_16)
-            continue;
-        if (opcode < OP_PUSHDATA1 && opcode > OP_0 && (data.size() == 1 && data[0] <= 16))
-            // Could have used an OP_n code, rather than a 1-byte push.
-            return false;
-        if (opcode == OP_PUSHDATA1 && data.size() < OP_PUSHDATA1)
-            // Could have used a normal n-byte push, rather than OP_PUSHDATA1.
-            return false;
-        if (opcode == OP_PUSHDATA2 && data.size() <= 0xFF)
-            // Could have used an OP_PUSHDATA1.
-            return false;
-        if (opcode == OP_PUSHDATA4 && data.size() <= 0xFFFF)
-            // Could have used an OP_PUSHDATA2.
-            return false;
-    }
-    return true;
-}
-
 class CScriptVisitor : public boost::static_visitor<bool>
 {
 private:
@@ -1848,13 +1770,13 @@ void CScript::SetDestination(const CTxDestination& dest)
     boost::apply_visitor(CScriptVisitor(this), dest);
 }
 
-void CScript::SetMultisig(int nRequired, const std::vector<CPubKey>& keys)
+void CScript::SetMultisig(int nRequired, const std::vector<CKey>& keys)
 {
     this->clear();
 
     *this << EncodeOP_N(nRequired);
-    BOOST_FOREACH(const CPubKey& key, keys)
-        *this << key;
+    BOOST_FOREACH(const CKey& key, keys)
+        *this << key.GetPubKey();
     *this << EncodeOP_N(keys.size()) << OP_CHECKMULTISIG;
 }
 
@@ -1879,17 +1801,20 @@ bool CScriptCompressor::IsToScriptID(CScriptID &hash) const
     return false;
 }
 
-bool CScriptCompressor::IsToPubKey(CPubKey &pubkey) const
+bool CScriptCompressor::IsToPubKey(std::vector<unsigned char> &pubkey) const
 {
     if (script.size() == 35 && script[0] == 33 && script[34] == OP_CHECKSIG
                             && (script[1] == 0x02 || script[1] == 0x03)) {
-        pubkey.Set(&script[1], &script[34]);
+        pubkey.resize(33);
+        memcpy(&pubkey[0], &script[1], 33);
         return true;
     }
     if (script.size() == 67 && script[0] == 65 && script[66] == OP_CHECKSIG
                             && script[1] == 0x04) {
-        pubkey.Set(&script[1], &script[66]);
-        return pubkey.IsFullyValid(); // if not fully valid, a case that would not be compressible
+        pubkey.resize(65);
+        memcpy(&pubkey[0], &script[1], 65);
+        CKey key;
+        return (key.SetPubKey(CPubKey(pubkey))); // SetPubKey fails if this is not a valid public key, a case that would not be compressible
     }
     return false;
 }
@@ -1910,7 +1835,7 @@ bool CScriptCompressor::Compress(std::vector<unsigned char> &out) const
         memcpy(&out[1], &scriptID, 20);
         return true;
     }
-    CPubKey pubkey;
+    std::vector<unsigned char> pubkey;
     if (IsToPubKey(pubkey)) {
         out.resize(33);
         memcpy(&out[1], &pubkey[1], 32);
@@ -1963,16 +1888,17 @@ bool CScriptCompressor::Decompress(unsigned int nSize, const std::vector<unsigne
         return true;
     case 0x04:
     case 0x05:
-        unsigned char vch[33] = {};
+        std::vector<unsigned char> vch(33, 0x00);
         vch[0] = nSize - 2;
         memcpy(&vch[1], &in[0], 32);
-        CPubKey pubkey(&vch[0], &vch[33]);
-        if (!pubkey.Decompress())
+        CKey key;
+        if (!key.SetPubKey(CPubKey(vch)))
             return false;
-        assert(pubkey.size() == 65);
+        key.SetCompressedPubKey(false); // Decompress public key
+        CPubKey pubkey = key.GetPubKey();
         script.resize(67);
         script[0] = 65;
-        memcpy(&script[1], pubkey.begin(), 65);
+        memcpy(&script[1], &pubkey.Raw()[0], 65);
         script[66] = OP_CHECKSIG;
         return true;
     }

@@ -1,7 +1,3 @@
-// Copyright (c) 2011-2013 The Bitcoin developers
-// Distributed under the MIT/X11 software license, see the accompanying
-// file COPYING or http://www.opensource.org/licenses/mit-license.php.
-
 #ifndef BITCOINGUI_H
 #define BITCOINGUI_H
 
@@ -18,6 +14,7 @@ class WalletStack;
 class TransactionView;
 class OverviewPage;
 class AddressBookPage;
+class MiningPage;
 class SendCoinsDialog;
 class SignVerifyMessageDialog;
 class Notificator;
@@ -69,10 +66,9 @@ public:
     QAction * getOverviewAction() { return overviewAction; }
     QAction * getHistoryAction() { return historyAction; }
     QAction * getAddressBookAction() { return addressBookAction; }
+    QAction * getMiningAction() { return miningAction; }
     QAction * getReceiveCoinsAction() { return receiveCoinsAction; }
     QAction * getSendCoinsAction() { return sendCoinsAction; }
-    QAction * getZerocoinAction() { return zerocoinAction; }
-
 
 protected:
     void changeEvent(QEvent *e);
@@ -86,6 +82,7 @@ private:
     WalletFrame *walletFrame;
 
     QLabel *labelEncryptionIcon;
+	QLabel *labelMiningIcon;
     QLabel *labelConnectionsIcon;
     QLabel *labelBlocksIcon;
     QLabel *progressBarLabel;
@@ -93,6 +90,7 @@ private:
 
     QMenuBar *appMenuBar;
     QAction *overviewAction;
+    QAction *miningAction;
     QAction *historyAction;
     QAction *quitAction;
     QAction *sendCoinsAction;
@@ -101,7 +99,6 @@ private:
     QAction *verifyMessageAction;
     QAction *aboutAction;
     QAction *receiveCoinsAction;
-    QAction *zerocoinAction;
     QAction *optionsAction;
     QAction *toggleHideAction;
     QAction *encryptWalletAction;
@@ -133,8 +130,6 @@ private:
     void saveWindowGeometry();
     /** Restore window size and position */
     void restoreWindowGeometry();
-    /** Enable or disable all wallet-related actions */
-    void setWalletActionsEnabled(bool enabled);
 
 public slots:
     /** Set number of connections shown in the UI */
@@ -145,6 +140,7 @@ public slots:
        @param[in] status            current encryption status
        @see WalletModel::EncryptionStatus
     */
+    void setMining(bool mining, int hashrate);
     void setEncryptionStatus(int status);
 
     /** Notify the user of an event from the core network or transaction handling code.
@@ -176,10 +172,10 @@ private slots:
     void gotoHistoryPage();
     /** Switch to address book page */
     void gotoAddressBookPage();
+	
+	void gotoMiningPage();
     /** Switch to receive coins page */
     void gotoReceiveCoinsPage();
-    /** Switch to zerocoin page */
-    void gotoZerocoinPage();
     /** Switch to send coins page */
     void gotoSendCoinsPage(QString addr = "");
 

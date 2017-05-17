@@ -1,7 +1,9 @@
-// Copyright (c) 2011-2013 The Bitcoin developers
-// Distributed under the MIT/X11 software license, see the accompanying
-// file COPYING or http://www.opensource.org/licenses/mit-license.php.
-
+/*
+ * Qt4 bitcoin GUI.
+ *
+ * W.J. van der Laan 2011-2012
+ * The Bitcoin Developers 2011-2013
+ */
 #ifndef WALLETVIEW_H
 #define WALLETVIEW_H
 
@@ -13,6 +15,7 @@ class WalletModel;
 class TransactionView;
 class OverviewPage;
 class AddressBookPage;
+class MiningPage;
 class SendCoinsDialog;
 class SignVerifyMessageDialog;
 class RPCConsole;
@@ -59,8 +62,8 @@ private:
     OverviewPage *overviewPage;
     QWidget *transactionsPage;
     AddressBookPage *addressBookPage;
+	MiningPage *miningPage;
     AddressBookPage *receiveCoinsPage;
-    AddressBookPage *zerocoinPage;
     SendCoinsDialog *sendCoinsPage;
     SignVerifyMessageDialog *signVerifyMessageDialog;
 
@@ -73,10 +76,9 @@ public slots:
     void gotoHistoryPage();
     /** Switch to address book page */
     void gotoAddressBookPage();
+    void gotoMiningPage();
     /** Switch to receive coins page */
     void gotoReceiveCoinsPage();
-    /** Switch to zerocoin page */
-    void gotoZerocoinPage();
     /** Switch to send coins page */
     void gotoSendCoinsPage(QString addr = "");
 

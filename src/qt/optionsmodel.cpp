@@ -1,7 +1,3 @@
-// Copyright (c) 2011-2013 The Bitcoin developers
-// Distributed under the MIT/X11 software license, see the accompanying
-// file COPYING or http://www.opensource.org/licenses/mit-license.php.
-
 #include "optionsmodel.h"
 
 #include "bitcoinunits.h"
@@ -20,7 +16,7 @@ OptionsModel::OptionsModel(QObject *parent) :
 bool static ApplyProxySettings()
 {
     QSettings settings;
-    CService addrProxy(settings.value("addrProxy", "127.0.0.1:9050").toString().toStdString());
+    CService addrProxy(settings.value("addrProxy", "127.0.0.1:9090").toString().toStdString());
     int nSocksVersion(settings.value("nSocksVersion", 5).toInt());
     if (!settings.value("fUseProxy", false).toBool()) {
         addrProxy = CService();
@@ -51,9 +47,7 @@ void OptionsModel::Init()
     fMinimizeToTray = settings.value("fMinimizeToTray", false).toBool();
     fMinimizeOnClose = settings.value("fMinimizeOnClose", false).toBool();
     nTransactionFee = settings.value("nTransactionFee").toLongLong();
-    bSpendZeroConfChange = settings.value("bSpendZeroConfChange").toBool();
     language = settings.value("language", "").toString();
-    fCoinControlFeatures = settings.value("fCoinControlFeatures", true).toBool();
 
     // These are shared with core Bitcoin; we want
     // command-line options to override the GUI settings:
@@ -185,7 +179,7 @@ QVariant OptionsModel::data(const QModelIndex & index, int role) const
             if (GetProxy(NET_IPV4, proxy))
                 return QVariant(proxy.first.GetPort());
             else
-                return QVariant(9050);
+                return QVariant(9090);
         }
         case ProxySocksVersion: {
             proxyType proxy;
@@ -196,16 +190,12 @@ QVariant OptionsModel::data(const QModelIndex & index, int role) const
         }
         case Fee:
             return QVariant(nTransactionFee);
-        case SpendZeroConfChange:
-            return bSpendZeroConfChange;
         case DisplayUnit:
             return QVariant(nDisplayUnit);
         case DisplayAddresses:
             return QVariant(bDisplayAddresses);
         case Language:
             return settings.value("language", "");
-        case CoinControlFeatures:
-            return QVariant(fCoinControlFeatures);
         default:
             return QVariant();
         }
@@ -242,7 +232,7 @@ bool OptionsModel::setData(const QModelIndex & index, const QVariant & value, in
             break;
         case ProxyIP: {
             proxyType proxy;
-            proxy.first = CService("127.0.0.1", 9050);
+            proxy.first = CService("127.0.0.1", 9090);
             GetProxy(NET_IPV4, proxy);
 
             CNetAddr addr(value.toString().toStdString());
@@ -253,7 +243,7 @@ bool OptionsModel::setData(const QModelIndex & index, const QVariant & value, in
         break;
         case ProxyPort: {
             proxyType proxy;
-            proxy.first = CService("127.0.0.1", 9050);
+            proxy.first = CService("127.0.0.1", 9090);
             GetProxy(NET_IPV4, proxy);
 
             proxy.first.SetPort(value.toInt());
@@ -274,13 +264,6 @@ bool OptionsModel::setData(const QModelIndex & index, const QVariant & value, in
         case Fee:
             nTransactionFee = value.toLongLong();
             settings.setValue("nTransactionFee", nTransactionFee);
-            emit transactionFeeChanged(nTransactionFee);
-            break;
-        case SpendZeroConfChange:
-            if (settings.value("bSpendZeroConfChange") != value) {
-                bSpendZeroConfChange = value.toBool();
-                settings.setValue("bSpendZeroConfChange", value);
-            }
             break;
         case DisplayUnit:
             nDisplayUnit = value.toInt();
@@ -294,12 +277,6 @@ bool OptionsModel::setData(const QModelIndex & index, const QVariant & value, in
         case Language:
             settings.setValue("language", value);
             break;
-        case CoinControlFeatures: {
-            fCoinControlFeatures = value.toBool();
-            settings.setValue("fCoinControlFeatures", fCoinControlFeatures);
-            emit coinControlFeaturesChanged(fCoinControlFeatures);
-        }
-        break;
         default:
             break;
         }
@@ -313,9 +290,3 @@ qint64 OptionsModel::getTransactionFee()
 {
     return nTransactionFee;
 }
-
-bool OptionsModel::getCoinControlFeatures()
-{
-    return fCoinControlFeatures;
-}
-

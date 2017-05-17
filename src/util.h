@@ -13,6 +13,8 @@
 #include <sys/types.h>
 #include <sys/time.h>
 #include <sys/resource.h>
+#else
+typedef int pid_t; /* define for Windows compatibility */
 #endif
 #include <map>
 #include <list>
@@ -144,7 +146,6 @@ extern bool fServer;
 extern bool fCommandLine;
 extern std::string strMiscWarning;
 extern bool fTestNet;
-extern bool fBloomFilters;
 extern bool fNoListen;
 extern bool fLogTimestamps;
 extern volatile bool fReopenDebugLog;
@@ -237,9 +238,12 @@ void runCommand(std::string strCommand);
 
 
 
+
+
+
 inline std::string i64tostr(int64 n)
 {
-    return strprintf("%" PRI64d, n);
+    return strprintf("%"PRI64d, n);
 }
 
 inline std::string itostr(int n)
@@ -304,8 +308,7 @@ std::string HexStr(const T itbegin, const T itend, bool fSpaces=false)
     return rv;
 }
 
-template<typename T>
-inline std::string HexStr(const T& vch, bool fSpaces=false)
+inline std::string HexStr(const std::vector<unsigned char>& vch, bool fSpaces=false)
 {
     return HexStr(vch.begin(), vch.end(), fSpaces);
 }
@@ -557,7 +560,7 @@ inline uint32_t ByteReverse(uint32_t value)
 //    threadGroup.create_thread(boost::bind(&LoopForever<boost::function<void()> >, "nothing", f, milliseconds));
 template <typename Callable> void LoopForever(const char* name,  Callable func, int64 msecs)
 {
-    std::string s = strprintf("bitcoin-%s", name);
+    std::string s = strprintf("marxcoin-%s", name);
     RenameThread(s.c_str());
     printf("%s thread start\n", name);
     try
@@ -583,7 +586,7 @@ template <typename Callable> void LoopForever(const char* name,  Callable func, 
 // .. and a wrapper that just calls func once
 template <typename Callable> void TraceThread(const char* name,  Callable func)
 {
-    std::string s = strprintf("bitcoin-%s", name);
+    std::string s = strprintf("marxcoin-%s", name);
     RenameThread(s.c_str());
     try
     {

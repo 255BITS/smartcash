@@ -304,8 +304,6 @@ public:
     }
 
     bool static Rewrite(const std::string& strFile, const char* pszSkip = NULL);
-
-
 };
 
 

@@ -1,7 +1,3 @@
-// Copyright (c) 2011-2013 The Bitcoin developers
-// Distributed under the MIT/X11 software license, see the accompanying
-// file COPYING or http://www.opensource.org/licenses/mit-license.php.
-
 #ifndef CLIENTMODEL_H
 #define CLIENTMODEL_H
 
@@ -32,12 +28,35 @@ class ClientModel : public QObject
 public:
     explicit ClientModel(OptionsModel *optionsModel, QObject *parent = 0);
     ~ClientModel();
-
+    enum MiningType
+    {
+        SoloMining,
+        PoolMining
+    };
     OptionsModel *getOptionsModel();
 
     int getNumConnections() const;
     int getNumBlocks() const;
     int getNumBlocksAtStartup();
+	MiningType getMiningType() const;
+	int getMiningThreads() const;
+    bool getMiningStarted() const;
+
+    bool getMiningDebug() const;
+    void setMiningDebug(bool debug);
+    int getMiningScanTime() const;
+    void setMiningScanTime(int scantime);
+    QString getMiningServer() const;
+    void setMiningServer(QString server);
+    QString getMiningPort() const;
+    void setMiningPort(QString port);
+    QString getMiningUsername() const;
+    void setMiningUsername(QString username);
+    QString getMiningPassword() const;
+    void setMiningPassword(QString password);
+
+    int getHashrate() const;
+    double GetDifficulty() const;
 
     double getVerificationProgress() const;
     QDateTime getLastBlockDate() const;
@@ -53,6 +72,7 @@ public:
     //! Return warnings to be displayed in status bar
     QString getStatusBarWarnings() const;
 
+	void setMining(MiningType type, bool mining, int threads, int hashrate);
     QString formatFullVersion() const;
     QString formatBuildDate() const;
     bool isReleaseVersion() const;
@@ -66,6 +86,18 @@ private:
     int cachedNumBlocksOfPeers;
 	bool cachedReindexing;
 	bool cachedImporting;
+	int cachedHashrate;
+
+    MiningType miningType;
+    int miningThreads;
+    bool miningStarted;
+    bool miningDebug;
+    int miningScanTime;
+    QString miningServer;
+    QString miningPort;
+    QString miningUsername;
+    QString miningPassword;
+
 
     int numBlocksAtStartup;
 
@@ -78,6 +110,7 @@ signals:
     void numConnectionsChanged(int count);
     void numBlocksChanged(int count, int countOfPeers);
     void alertsChanged(const QString &warnings);
+    void miningChanged(bool mining, int count);
 
     //! Asynchronous message notification
     void message(const QString &title, const QString &message, unsigned int style);
