@@ -64,6 +64,7 @@ namespace Checkpoints
         100.0
 */    };
 
+
     const CCheckpointData &Checkpoints() {
         if (fTestNet)
             return dataTestnet;

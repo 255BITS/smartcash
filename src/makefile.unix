@@ -127,6 +127,7 @@ OBJS= \
     obj/init.o \
     obj/keystore.o \
     obj/main.o \
+    obj/momentum.o \
     obj/net.o \
     obj/protocol.o \
     obj/bitcoinrpc.o \
@@ -156,10 +157,8 @@ OBJS= \
     obj/libzerocoin/Params.o \
     obj/libzerocoin/SerialNumberSignatureOfKnowledge.o \
     obj/libzerocoin/SpendMetaData.o \
-    Lyra2Z/blake.o \
-    Lyra2Z/Lyra2.o \
-    Lyra2Z/Lyra2Z.o \
-    Lyra2Z/Sponge.o
+    obj/groestl.o \
+    obj/keccak.o
 
 ifdef USE_SSE2
 DEFS += -DUSE_SSE2
