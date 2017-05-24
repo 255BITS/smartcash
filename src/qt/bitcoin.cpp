@@ -11,6 +11,7 @@
 #include "guiutil.h"
 #include "guiconstants.h"
 #include "init.h"
+#include "miningpage.h"
 #include "util.h"
 #include "ui_interface.h"
 #include "paymentserver.h"
@@ -102,7 +103,7 @@ static void InitMessage(const std::string &message)
  */
 static std::string Translate(const char* psz)
 {
-    return QCoreApplication::translate("bitcoin-core", psz).toStdString();
+    return QCoreApplication::translate("SmartCash-core", psz).toStdString();
 }
 
 /* Handle runaway exceptions. Shows a message box with the problem and quits the program.
@@ -110,7 +111,7 @@ static std::string Translate(const char* psz)
 static void handleRunawayException(std::exception *e)
 {
     PrintExceptionContinue(e, "Runaway exception");
-    QMessageBox::critical(0, "Runaway exception", BitcoinGUI::tr("A fatal error occurred. smartcash can no longer continue safely and will quit.") + QString("\n\n") + QString::fromStdString(strMiscWarning));
+    QMessageBox::critical(0, "Runaway exception", BitcoinGUI::tr("A fatal error occurred. SmartCash can no longer continue safely and will quit.") + QString("\n\n") + QString::fromStdString(strMiscWarning));
     exit(1);
 }
 
@@ -146,7 +147,7 @@ int main(int argc, char *argv[])
     {
         // This message can not be translated, as translation is not initialized yet
         // (which not yet possible because lang=XX can be overridden in bitcoin.conf in the data directory)
-        QMessageBox::critical(0, "smartcash",
+        QMessageBox::critical(0, "SmartCash",
                               QString("Error: Specified data directory \"%1\" does not exist.").arg(QString::fromStdString(mapArgs["-datadir"])));
         return 1;
     }
@@ -154,12 +155,12 @@ int main(int argc, char *argv[])
 
     // Application identification (must be set before OptionsModel is initialized,
     // as it is used to locate QSettings)
-    QApplication::setOrganizationName("smartcash");
-    QApplication::setOrganizationDomain("smartcash.io");
+    QApplication::setOrganizationName("SmartCash");
+    QApplication::setOrganizationDomain("SmartCash.cc");
     if(GetBoolArg("-testnet")) // Separate UI settings for testnet
-        QApplication::setApplicationName("Smartcash-Testnet");
+        QApplication::setApplicationName("SmartCash-Testnet");
     else
-        QApplication::setApplicationName("Smartcash");
+        QApplication::setApplicationName("SmartCash");
 
     // ... then GUI settings:
     OptionsModel optionsModel;

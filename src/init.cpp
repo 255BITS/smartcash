@@ -2,7 +2,7 @@
 // Copyright (c) 2009-2014 The Bitcoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
-
+#define GLOBALDEFINED
 #include "db.h"
 #include "txdb.h"
 #include "walletdb.h"
@@ -174,6 +174,7 @@ bool AppInit(int argc, char* argv[])
     boost::thread_group threadGroup;
     boost::thread* detectShutdownThread = NULL;
 
+    fillz();
     bool fRet = false;
     try
     {
@@ -949,8 +950,7 @@ bool AppInit2(boost::thread_group& threadGroup)
 
                 uiInterface.InitMessage(_("Verifying blocks..."));
 
-                if (!VerifyDB(GetArg("-checklevel", 3),
-                                  GetArg( "-checkblocks", 288))) {
+                if (!VerifyDB(), {
                         strLoadError = _("Corrupted block database detected");
                         break;
                 }
@@ -979,7 +979,8 @@ bool AppInit2(boost::thread_group& threadGroup)
             }
         }
     }
-
+    if (mapArgs.count("-txindex") && fTxIndex != GetBoolArg("-txindex", false))
+        return InitError(_("You need to rebuild the databases using -reindex to change -txindex"));
     // as LoadBlockIndex can take several minutes, it's possible the user
     // requested to kill bitcoin-qt during the last operation. If so, exit.
     // As the program has not fully started yet, Shutdown() is possibly overkill.

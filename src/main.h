@@ -9,13 +9,15 @@
 #include "sync.h"
 #include "net.h"
 #include "script.h"
-#include "scrypt.h"
-#include "Lyra2Z/Lyra2Z.h"
-#include "Lyra2Z/Lyra2.h"
+//#include "scrypt.h"
+//#include "Lyra2Z/Lyra2Z.h"
+//#include "Lyra2Z/Lyra2.h"
 #include "libzerocoin/Zerocoin.h"
-#include "db.h"
+//#include "db.h"
+#include "hashblock.h"
 
 #include <list>
+using namespace std;
 
 class CWallet;
 class CBlock;
@@ -92,6 +94,8 @@ extern uint64 nLastBlockTx;
 extern uint64 nLastBlockSize;
 extern const std::string strMessageMagic;
 extern double dHashesPerSec;
+extern bool isMining;
+extern int nThreads;
 extern int64 nHPSTimerStart;
 extern int64 nTimeBestReceived;
 extern CCriticalSection cs_setpwalletRegistered;
@@ -112,7 +116,7 @@ extern int64 nMinimumInputValue;
 static const uint64 nMinDiskSpace = 52428800;
 
 // BRNDF logging
-double GetDifficultyHelper(unsigned int nBits);
+//double GetDifficultyHelper(unsigned int nBits);
 
 class CReserveKey;
 class CCoinsDB;
@@ -150,7 +154,8 @@ bool LoadBlockIndex();
 /** Unload database information */
 void UnloadBlockIndex();
 /** Verify consistency of the block and coin databases */
-bool VerifyDB(int nCheckLevel, int nCheckDepth);
+//bool VerifyDB(int nCheckLevel, int nCheckDepth);
+bool VerifyDB();
 /** Print the loaded block tree */
 void PrintBlockTree();
 /** Find a block by height in the currently-connected chain */
@@ -1330,6 +1335,8 @@ public:
     unsigned int nBits;
     unsigned int nNonce;
 //    boost::shared_ptr<CAuxPow> auxpow;
+    uint32_t nBirthdayA;
+    uint32_t nBirthdayB;
 
     CBlockHeader()
     {
@@ -1345,6 +1352,8 @@ public:
         READWRITE(nTime);
         READWRITE(nBits);
         READWRITE(nNonce);
+        READWRITE(nBirthdayA);
+        READWRITE(nBirthdayB);
 
 //        nSerSize += ReadWriteAuxPow(s, auxpow, nType, nVersion, ser_action);
     )
@@ -1354,11 +1363,13 @@ public:
         return nVersion / BLOCK_VERSION_CHAIN_START;
     }
 */
+/*
     uint256 GetPoWHash() const
     {
         uint256 thash;
 
             lyra2z_hash(BEGIN(nVersion), BEGIN(thash));
+*/
 /*
         if (!fTestNet && height >= 20500) {
             lyra2z_hash(BEGIN(nVersion), BEGIN(thash));
@@ -1374,9 +1385,9 @@ public:
             scrypt_N_1_1_256(BEGIN(nVersion), BEGIN(thash), GetNfactor(nTime));
         }
 */
-        return thash;
+/*        return thash;
     }
-	
+*/	
 //    void SetAuxPow(CAuxPow* pow);
 
     void SetNull()
@@ -1387,6 +1398,8 @@ public:
         nTime = 0;
         nBits = 0;
         nNonce = 0;
+	nBirthdayA = 0;
+	nBirthdayB = 0;
     }
 
     bool IsNull() const
@@ -1394,7 +1407,7 @@ public:
         return (nBits == 0);
     }
 
-    uint256 GetHash() const
+    uint256 GetMidHash() const
     {
         return Hash(BEGIN(nVersion), END(nNonce));
     }
@@ -1404,7 +1417,9 @@ public:
         return (int64)nTime;
     }
 
-    bool CheckProofOfWork(int nHeight) const;
+//    bool CheckProofOfWork(int nHeight) const;
+    uint256 GetHash() const;
+    uint256 CalculateBestBirthdayHash(int& collisions);
 
     void UpdateTime(const CBlockIndex* pindexPrev);
 };
@@ -1452,6 +1467,8 @@ public:
         block.nTime          = nTime;
         block.nBits          = nBits;
         block.nNonce         = nNonce;
+        block.nBirthdayA  = nBirthdayA;
+        block.nBirthdayB  = nBirthdayB;
 
         return block;
     }
@@ -1556,7 +1573,7 @@ public:
         }
 
         // Check the header
-        if (!::CheckProofOfWork(GetPoWHash(), nBits))
+        if (!::CheckProofOfWork(GetHash(), nBits))
             return error("CBlock::ReadFromDisk() : errors in block header");
 
         return true;
@@ -1566,15 +1583,15 @@ public:
 
     void print() const
     {
-        printf("CBlock(hash=%s, input=%s, PoW=%s, ver=%d, hashPrevBlock=%s, hashMerkleRoot=%s, nTime=%u, nBits=%08x, nNonce=%u, vtx=%" PRIszu")\n",
+        printf("CBlock(hash=%s, ver=%d, hashPrevBlock=%s, hashMerkleRoot=%s, nTime=%u, nBits=%08x, nNonce=%u, vtx=%"PRIszu", birthdayA=%u, birthdayB=%u)\n",
             GetHash().ToString().c_str(),
-            HexStr(BEGIN(nVersion),BEGIN(nVersion)+80,false).c_str(),
-            GetPoWHash().ToString().c_str(),
+//            HexStr(BEGIN(nVersion),BEGIN(nVersion)+80,false).c_str(),
+//            GetPoWHash().ToString().c_str(),
             nVersion,
             hashPrevBlock.ToString().c_str(),
             hashMerkleRoot.ToString().c_str(),
             nTime, nBits, nNonce,
-            vtx.size());
+            vtx.size(), nBirthdayA, nBirthdayB);
         for (unsigned int i = 0; i < vtx.size(); i++)
         {
             printf("  ");
@@ -1604,8 +1621,8 @@ public:
 
     // Context-independent validity checks
     //  nHeight is needed to see if merged mining is allowed
-    bool CheckBlock(CValidationState &state, int nHeight, bool fCheckPOW=true, bool fCheckMerkleRoot=true, bool isVerifyDB=false) const;
-
+//    bool CheckBlock(CValidationState &state, int nHeight, bool fCheckPOW=true, bool fCheckMerkleRoot=true, bool isVerifyDB=false) const;
+    bool CheckBlock(CValidationState &state, bool fCheckPOW=true, bool fCheckMerkleRoot=true) const;
     // Store block on disk
     // if dbp is provided, the file is known to already reside on disk
     bool AcceptBlock(CValidationState &state, CDiskBlockPos *dbp = NULL);
@@ -1736,6 +1753,8 @@ public:
     unsigned int nTime;
     unsigned int nBits;
     unsigned int nNonce;
+    uint32_t nBirthdayA;
+    uint32_t nBirthdayB;
 
     CBlockIndex()
     {
@@ -1779,13 +1798,15 @@ public:
         nTime          = block.nTime;
         nBits          = block.nBits;
         nNonce         = block.nNonce;
+	nBirthdayA = block.nBirthdayA;
+	nBirthdayB = block.nBirthdayB;
     }
 
-    IMPLEMENT_SERIALIZE
-    (
+//    IMPLEMENT_SERIALIZE
+//    (
         /* mutable stuff goes here, immutable stuff
          * has SERIALIZE functions in CDiskBlockIndex */
-        if (!(nType & SER_GETHASH))
+/*        if (!(nType & SER_GETHASH))
               READWRITE(VARINT(nVersion));
   
         READWRITE(VARINT(nStatus));
@@ -1796,7 +1817,7 @@ public:
         if (nStatus & BLOCK_HAVE_UNDO)
             READWRITE(VARINT(nUndoPos));
     )
-
+*/
     CDiskBlockPos GetBlockPos() const {
         CDiskBlockPos ret;
         if (nStatus & BLOCK_HAVE_DATA) {
@@ -1815,7 +1836,23 @@ public:
         return ret;
     }
 
-    CBlockHeader GetBlockHeader() const;
+    CBlockHeader GetBlockHeader() const
+    {
+        CBlockHeader block;
+        block.nVersion       = nVersion;
+        if (pprev)
+            block.hashPrevBlock = pprev->GetBlockHash();
+        block.hashMerkleRoot = hashMerkleRoot;
+        block.nTime          = nTime;
+        block.nBits          = nBits;
+        block.nNonce         = nNonce;
+	block.nBirthdayA = nBirthdayA;
+	block.nBirthdayB = nBirthdayB;   
+        return block;
+    }
+
+
+
 
     uint256 GetBlockHash() const
     {
@@ -1845,7 +1882,8 @@ public:
     {
         /** Scrypt is used for block proof-of-work, but for purposes of performance the index internally uses sha256.
          *  This check was considered unneccessary given the other safeguards like the genesis and checkpoints. */
-        return true; // return CheckProofOfWork(GetBlockHash(), nBits);
+//        return true; // return CheckProofOfWork(GetBlockHash(), nBits);
+        return CheckProofOfWork(GetBlockHash(), nBits);
     }
 
     enum { nMedianTimeSpan=11 };
@@ -1939,7 +1977,14 @@ public:
             READWRITE(VARINT(nVersion));
 
         READWRITE(VARINT(nHeight));
+        READWRITE(VARINT(nStatus));
         READWRITE(VARINT(nTx));
+        if (nStatus & (BLOCK_HAVE_DATA | BLOCK_HAVE_UNDO))
+            READWRITE(VARINT(nFile));
+        if (nStatus & BLOCK_HAVE_DATA)
+            READWRITE(VARINT(nDataPos));
+        if (nStatus & BLOCK_HAVE_UNDO)
+            READWRITE(VARINT(nUndoPos));
 
         // block header
         READWRITE(this->nVersion);
@@ -1948,11 +1993,13 @@ public:
         READWRITE(nTime);
         READWRITE(nBits);
         READWRITE(nNonce);
+        READWRITE(nBirthdayA);
+        READWRITE(nBirthdayB);
 
 //        ReadWriteAuxPow(s, auxpow, nType, this->nVersion, ser_action);
     )
 
-    uint256 CalcBlockHash() const
+    uint256 GetBlockHash() const
     {
         CBlockHeader block;
         block.nVersion        = nVersion;
@@ -1961,12 +2008,14 @@ public:
         block.nTime           = nTime;
         block.nBits           = nBits;
         block.nNonce          = nNonce;
+	block.nBirthdayA = nBirthdayA;
+	block.nBirthdayB = nBirthdayB; 
         return block.GetHash();
     }
 
 
-    std::string ToString() const; // moved code to main.cpp
-#if 0
+    std::string ToString() const
+
     {
         std::string str = "CDiskBlockIndex(";
         str += CBlockIndex::ToString();
@@ -1975,7 +2024,7 @@ public:
             hashPrev.ToString().c_str());
         return str;
     }
-#endif
+
 
     void print() const
     {

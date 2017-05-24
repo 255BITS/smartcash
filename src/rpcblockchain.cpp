@@ -15,7 +15,17 @@ void TxToJSON(const CTransaction& tx, const uint256 hashBlock, Object& entry);
 
 void ScriptPubKeyToJSON(const CScript& scriptPubKey, Object& out);
 
-double GetDifficultyHelper(unsigned int nBits) {
+double GetDifficulty(const CBlockIndex* blockindex)
+{
+    // Floating point number that is a multiple of the minimum difficulty,
+    // minimum difficulty = 1.0.
+    if (blockindex == NULL)
+    {
+        if (pindexBest == NULL)
+            return 1.0;
+        else
+            blockindex = pindexBest;
+    }
     int nShift = (nBits >> 24) & 0xff;
     double dDiff = (double)0x0000ffff / (double)(nBits & 0x00ffffff);
 
@@ -33,27 +43,11 @@ double GetDifficultyHelper(unsigned int nBits) {
     return dDiff;
 }
 
-double GetDifficulty(const CBlockIndex* blockindex)
-{
-    // Floating point number that is a multiple of the minimum difficulty,
-    // minimum difficulty = 1.0.
-    if (blockindex == NULL)
-    {
-        if (pindexBest == NULL)
-            return 1.0;
-        else
-            blockindex = pindexBest;
-    }
-
-    return GetDifficultyHelper(blockindex->nBits);
-}
-
-
 Object blockToJSON(const CBlock& block, const CBlockIndex* blockindex)
 {
     Object result;
     result.push_back(Pair("hash", block.GetHash().GetHex()));
-    result.push_back(Pair("pow_hash", block.GetPoWHash().GetHex()));
+//    result.push_back(Pair("pow_hash", block.GetPoWHash().GetHex()));
     CMerkleTx txGen(block.vtx[0]);
     txGen.SetMerkleBranch(&block);
     result.push_back(Pair("confirmations", (int)txGen.GetDepthInMainChain()));
@@ -146,7 +140,7 @@ Value getdifficulty(const Array& params, bool fHelp)
 
 Value settxfee(const Array& params, bool fHelp)
 {
-    if (fHelp || params.size() < 1 || params.size() > 1)
+     if (fHelp || params.size() < 1 || params.size() > 1)
         throw runtime_error(
             "settxfee <amount SMART/KB>\n"
             "<amount> is a real and is rounded to the nearest 0.00000001 SMART per KB");

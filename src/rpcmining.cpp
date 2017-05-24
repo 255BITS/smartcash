@@ -3,7 +3,7 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "main.h"
+//#include "main.h"
 #include "db.h"
 #include "init.h"
 #include "bitcoinrpc.h"
@@ -11,7 +11,7 @@
 
 using namespace json_spirit;
 using namespace std;
-
+/*
 // Return average network hashes per second based on the last 'lookup' blocks,
 // or from the last difficulty change if 'lookup' is nonpositive.
 // If 'height' is nonnegative, compute the estimate at the time when a given block was found.
@@ -85,7 +85,7 @@ void ShutdownRPCMining()
 
     delete pMiningKey; pMiningKey = NULL;
 }
-
+*/
 Value getgenerate(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() != 0)
@@ -93,8 +93,8 @@ Value getgenerate(const Array& params, bool fHelp)
             "getgenerate\n"
             "Returns true or false.");
 
-    if (!pMiningKey)
-        return false;
+//    if (!pMiningKey)
+//        return false;
 
     return GetBoolArg("-gen");
 }
@@ -121,7 +121,7 @@ Value setgenerate(const Array& params, bool fHelp)
     }
     mapArgs["-gen"] = (fGenerate ? "1" : "0");
 
-    assert(pwalletMain != NULL);
+//    assert(pwalletMain != NULL);
     GenerateBitcoins(fGenerate, pwalletMain);
     return Value::null;
 }
@@ -131,12 +131,22 @@ Value gethashespersec(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() != 0)
         throw runtime_error(
-            "gethashespersec\n"
-            "Returns a recent hashes per second performance measurement while generating.");
+//            "gethashespersec\n"
+//            "Returns a recent hashes per second performance measurement while generating.");
+	    "getcollisionspermin\n"
+	    "Returns a recent hashes per second performance measurement while generating. You may to mine for 4 minutes before this shows a non-zero value.");
 
-    if (GetTimeMillis() - nHPSTimerStart > 8000)
-        return (boost::int64_t)0;
-    return (boost::int64_t)dHashesPerSec;
+    if (GetTimeMillis() - nHPSTimerStart > 8000*60){
+
+        return "No information yet. Wait at least 4 minutes after starting mining for estimate.";
+        //return (boost::int64_t)0;
+    }
+    return dHashesPerSec / 60.0;
+
+
+//    if (GetTimeMillis() - nHPSTimerStart > 8000)
+//        return (boost::int64_t)0;
+//    return (boost::int64_t)dHashesPerSec;
 }
 
 
@@ -151,17 +161,19 @@ Value getmininginfo(const Array& params, bool fHelp)
     obj.push_back(Pair("blocks",        (int)nBestHeight));
     obj.push_back(Pair("currentblocksize",(uint64_t)nLastBlockSize));
     obj.push_back(Pair("currentblocktx",(uint64_t)nLastBlockTx));
-    obj.push_back(Pair("difficulty",    (double)GetDifficulty()));
+    obj.push_back(Pair("difficulty",    (double)GetDifficulty()*64));
     obj.push_back(Pair("errors",        GetWarnings("statusbar")));
-    obj.push_back(Pair("generate",      GetBoolArg("-gen")));
+//    obj.push_back(Pair("generate",      GetBoolArg("-gen")));
+    obj.push_back(Pair("generate",      isMining))
     obj.push_back(Pair("genproclimit",  (int)GetArg("-genproclimit", -1)));
-    obj.push_back(Pair("hashespersec",  gethashespersec(params, false)));
-    obj.push_back(Pair("networkhashps", getnetworkhashps(params, false)));
+//    obj.push_back(Pair("hashespersec",  gethashespersec(params, false)));
+//    obj.push_back(Pair("networkhashps", getnetworkhashps(params, false)));
+    obj.push_back(Pair("collisionspersec",  gethashespersec(params, false)));
     obj.push_back(Pair("pooledtx",      (uint64_t)mempool.size()));
     obj.push_back(Pair("testnet",       fTestNet));
     return obj;
 }
-
+/*
 
 Value getworkex(const Array& params, bool fHelp)
 {
@@ -297,7 +309,7 @@ Value getworkex(const Array& params, bool fHelp)
         return CheckWork(pblock, *pwalletMain, reservekey);
     }
 }
-
+*/
 
 Value getwork(const Array& params, bool fHelp)
 {
@@ -321,15 +333,15 @@ Value getwork(const Array& params, bool fHelp)
     static mapNewBlock_t mapNewBlock;    // FIXME: thread safety
     static vector<CBlockTemplate*> vNewBlockTemplate;
 
-    if (params.size() == 0)
-    {
+//    if (params.size() == 0)
+//    {
         // Update block
         static unsigned int nTransactionsUpdatedLast;
         static CBlockIndex* pindexPrev;
         static int64 nStart;
         static CBlockTemplate* pblocktemplate;
         if (pindexPrev != pindexBest ||
-            (nTransactionsUpdated != nTransactionsUpdatedLast && GetTime() - nStart > 60))
+            (nTransactionsUpdated != nTransactionsUpdatedLast && GetTime() - nStart > 30))
         {
             if (pindexPrev != pindexBest)
             {
@@ -349,7 +361,7 @@ Value getwork(const Array& params, bool fHelp)
             nStart = GetTime();
 
             // Create new block
-            pblocktemplate = CreateNewBlockWithKey(*pMiningKey);
+            pblocktemplate = CreateNewBlock(*pMiningKey);
             if (!pblocktemplate)
                 throw JSONRPCError(RPC_OUT_OF_MEMORY, "Out of memory");
             vNewBlockTemplate.push_back(pblocktemplate);
@@ -374,14 +386,18 @@ Value getwork(const Array& params, bool fHelp)
         char pmidstate[32];
         char pdata[128];
         char phash1[64];
-        FormatHashBuffers(pblock, pmidstate, pdata, phash1);
-
+//        FormatHashBuffers(pblock, pmidstate, pdata, phash1);
+        pblock->nBirthdayA = 0;
+        pblock->nBirthdayB = 0;
         uint256 hashTarget = CBigNum().SetCompact(pblock->nBits).getuint256();
+        uint256 initHash = pblock->GetHash();
+      //  fprintf( stderr, "init hash %s\n", initHash.ToString().c_str() );
+        memcpy( pdata, (char*)pblock, 88 );
 
         Object result;
-        result.push_back(Pair("midstate", HexStr(BEGIN(pmidstate), END(pmidstate)))); // deprecated
+//        result.push_back(Pair("midstate", HexStr(BEGIN(pmidstate), END(pmidstate)))); // deprecated
         result.push_back(Pair("data",     HexStr(BEGIN(pdata), END(pdata))));
-        result.push_back(Pair("hash1",    HexStr(BEGIN(phash1), END(phash1)))); // deprecated
+//        result.push_back(Pair("hash1",    HexStr(BEGIN(phash1), END(phash1)))); // deprecated
         result.push_back(Pair("target",   HexStr(BEGIN(hashTarget), END(hashTarget))));
         return result;
     }
@@ -394,12 +410,16 @@ Value getwork(const Array& params, bool fHelp)
             vchData.insert(vchData.begin(), 0);
         }
 */
-        if (vchData.size() != 128)
+//        if (vchData.size() != 128)
+        if (vchData.size() != 88)
             throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter");
-        CBlock* pdata = (CBlock*)&vchData[0];
+        CBlock* pdata = (CBlock*)vchData.data();//&vchData[0];
+        uint32_t* noncedata = (uint32_t*)pdata;
+//        CBlock* pdata = (CBlock*)&vchData[0];
+
         // Byte reverse
-        for (int i = 0; i < 128/4; i++)
-            ((unsigned int*)pdata)[i] = ByteReverse(((unsigned int*)pdata)[i]);
+//        for (int i = 0; i < 128/4; i++)
+//            ((unsigned int*)pdata)[i] = ByteReverse(((unsigned int*)pdata)[i]);
 
         // Get saved block
         if (!mapNewBlock.count(pdata->hashMerkleRoot))
@@ -408,11 +428,29 @@ Value getwork(const Array& params, bool fHelp)
 
         pblock->nTime = pdata->nTime;
         pblock->nNonce = pdata->nNonce;
+        pblock->nBirthdayA = pdata->nBirthdayA;
+        pblock->nBirthdayB = pdata->nBirthdayB;
         pblock->vtx[0].vin[0].scriptSig = mapNewBlock[pdata->hashMerkleRoot].second;
         pblock->hashMerkleRoot = pblock->BuildMerkleTree();
 
-        assert(pwalletMain != NULL);
-        return CheckWork(pblock, *pwalletMain, *pMiningKey);
+//        assert(pwalletMain != NULL);
+//        return CheckWork(pblock, *pwalletMain, *pMiningKey);
+        uint256 posthash = pblock->GetHash();
+       // fprintf( stderr, "post hash %s\n", posthash.ToString().c_str() );
+
+        bool check =  CheckWork(pblock, *pwalletMain, *pMiningKey);
+       // fprintf( stderr, "check %d\n", check );
+        /*
+        if( check ) 
+        {
+            mapNewBlock.clear();
+            BOOST_FOREACH(CBlockTemplate* pblocktemplate, vNewBlockTemplate)
+              delete pblocktemplate;
+            vNewBlockTemplate.clear();
+            pindexPrev = NULL;
+        }
+        */
+        return check;
     }
 }
 
@@ -485,8 +523,9 @@ Value getblocktemplate(const Array& params, bool fHelp)
             delete pblocktemplate;
             pblocktemplate = NULL;
         }
-        CScript scriptDummy = CScript() << OP_TRUE;
-        pblocktemplate = CreateNewBlock(scriptDummy);
+//        CScript scriptDummy = CScript() << OP_TRUE;
+//        pblocktemplate = CreateNewBlock(scriptDummy);
+        pblocktemplate = CreateNewBlock(*pMiningKey);
         if (!pblocktemplate)
             throw JSONRPCError(RPC_OUT_OF_MEMORY, "Out of memory");
 

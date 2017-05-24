@@ -147,7 +147,6 @@ HEADERS += src/qt/bitcoingui.h \
     src/qt/aboutdialog.h \
     src/qt/editaddressdialog.h \
     src/qt/bitcoinaddressvalidator.h \
-    src/auxpow.h \
     src/alert.h \
     src/addrman.h \
     src/base58.h \
@@ -255,7 +254,6 @@ SOURCES += src/qt/bitcoin.cpp \
     src/qt/aboutdialog.cpp \
     src/qt/editaddressdialog.cpp \
     src/qt/bitcoinaddressvalidator.cpp \
-    src/auxpow.cpp \
     src/alert.cpp \
     src/version.cpp \
     src/sync.cpp \
@@ -325,7 +323,7 @@ SOURCES += src/qt/bitcoin.cpp \
     src/libzerocoin/ParamGeneration.cpp \
     src/libzerocoin/Params.cpp \
     src/libzerocoin/SerialNumberSignatureOfKnowledge.cpp \
-    src/libzerocoin/SpendMetaData.cpp
+    src/libzerocoin/SpendMetaData.cpp \
     src/momentum.cpp \
     src/groestl.c \
     src/keccak.c
