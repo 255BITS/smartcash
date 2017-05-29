@@ -1,13 +1,9 @@
-// Copyright (c) 2011-2013 The Bitcoin developers
-// Distributed under the MIT/X11 software license, see the accompanying
-// file COPYING or http://www.opensource.org/licenses/mit-license.php.
-
 #ifndef OPTIONSMODEL_H
 #define OPTIONSMODEL_H
 
 #include <QAbstractListModel>
 
-/** Interface from Qt to configuration data structure for Bitcoin client.
+/** Interface from Qt to configuration data structure for BctCoin client.
    To Qt, the options are presented as a list with the different options
    laid out vertically.
    This can be changed to a tree once the settings become sufficiently
@@ -30,11 +26,9 @@ public:
         ProxyPort,         // int
         ProxySocksVersion, // int
         Fee,               // qint64
-        DisplayUnit,       // BitcoinUnits::Unit
+        DisplayUnit,       // BctCoinUnits::Unit
         DisplayAddresses,  // bool
         Language,          // QString
-        CoinControlFeatures, // bool
-        SpendZeroConfChange,    // bool
         OptionIDRowCount,
     };
 
@@ -55,7 +49,6 @@ public:
     int getDisplayUnit() { return nDisplayUnit; }
     bool getDisplayAddresses() { return bDisplayAddresses; }
     QString getLanguage() { return language; }
-    bool getCoinControlFeatures();
 
 private:
     int nDisplayUnit;
@@ -63,12 +56,9 @@ private:
     bool fMinimizeToTray;
     bool fMinimizeOnClose;
     QString language;
-    bool fCoinControlFeatures;
 
 signals:
     void displayUnitChanged(int unit);
-    void transactionFeeChanged(qint64);
-    void coinControlFeaturesChanged(bool);
 };
 
 #endif // OPTIONSMODEL_H

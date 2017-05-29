@@ -1,7 +1,3 @@
-// Copyright (c) 2011-2013 The Bitcoin developers
-// Distributed under the MIT/X11 software license, see the accompanying
-// file COPYING or http://www.opensource.org/licenses/mit-license.php.
-
 #ifndef ADDRESSBOOKPAGE_H
 #define ADDRESSBOOKPAGE_H
 
@@ -30,8 +26,7 @@ class AddressBookPage : public QDialog
 public:
     enum Tabs {
         SendingTab = 0,
-        ReceivingTab = 1,
-        ZerocoinTab = 2
+        ReceivingTab = 1
     };
 
     enum Mode {
@@ -82,11 +77,6 @@ private slots:
     void onEditAction();
     /** Export button clicked */
     void on_exportButton_clicked();
-    /** Zerocoin Mint clicked */
-    void on_zerocoinMintButton_clicked();
-    /** Zerocoin Spend clicked */
-    void on_zerocoinSpendButton_clicked();
-
 
     /** Set button states based on selected tab and selection */
     void selectionChanged();

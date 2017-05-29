@@ -1,5 +1,6 @@
+
 // Copyright (c) 2009-2010 Satoshi Nakamoto
-// Copyright (c) 2009-2014 The Bitcoin developers
+// Copyright (c) 2009-2012 The Bitcoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 #ifndef BITCOIN_MAIN_H
@@ -9,11 +10,6 @@
 #include "sync.h"
 #include "net.h"
 #include "script.h"
-#include "scrypt.h"
-#include "Lyra2Z/Lyra2Z.h"
-#include "Lyra2Z/Lyra2.h"
-#include "libzerocoin/Zerocoin.h"
-#include "db.h"
 
 #include <list>
 
@@ -26,20 +22,19 @@ class CReserveKey;
 class CAddress;
 class CInv;
 class CNode;
-class CAuxPow;
 
 struct CBlockIndexWorkComparator;
 
 /** The maximum allowed size for a serialized block, in bytes (network rule) */
-static const unsigned int MAX_BLOCK_SIZE = 2000000;                      // 2000KB block hard limit
+static const unsigned int MAX_BLOCK_SIZE = 1000000;
 /** Obsolete: maximum size for mined blocks */
-static const unsigned int MAX_BLOCK_SIZE_GEN = MAX_BLOCK_SIZE/4;         // 500KB  block soft limit
+static const unsigned int MAX_BLOCK_SIZE_GEN = MAX_BLOCK_SIZE/2;
 /** Default for -blockmaxsize, maximum size for mined blocks **/
-static const unsigned int DEFAULT_BLOCK_MAX_SIZE = 500000;
+static const unsigned int DEFAULT_BLOCK_MAX_SIZE = 350000;
 /** Default for -blockprioritysize, maximum space for zero/low-fee transactions **/
-static const unsigned int DEFAULT_BLOCK_PRIORITY_SIZE = 50000; // 50KB
+static const unsigned int DEFAULT_BLOCK_PRIORITY_SIZE = 30000;
 /** The maximum size for transactions we're willing to relay/mine */
-static const unsigned int MAX_STANDARD_TX_SIZE = 300000;
+static const unsigned int MAX_STANDARD_TX_SIZE = 1000000000;
 /** The maximum allowed number of signature check operations in a block (network rule) */
 static const unsigned int MAX_BLOCK_SIGOPS = MAX_BLOCK_SIZE/50;
 /** The maximum number of orphan transactions kept in memory */
@@ -54,12 +49,8 @@ static const unsigned int BLOCKFILE_CHUNK_SIZE = 0x1000000; // 16 MiB
 static const unsigned int UNDOFILE_CHUNK_SIZE = 0x100000; // 1 MiB
 /** Fake height value used in CCoins to signify they are only in the memory pool (since 0.8) */
 static const unsigned int MEMPOOL_HEIGHT = 0x7FFFFFFF;
-/** Dust Soft Limit, allowed with additional fee per output */
-static const int64 DUST_SOFT_LIMIT = 100000; // 0.001 SMART
-/** Dust Hard Limit, ignored as wallet inputs (mininput default) */
-static const int64 DUST_HARD_LIMIT = 1000;   // 0.00001 SMART mininput
-/** No amount larger than this (in ztoshi) is valid */
-static const int64 MAX_MONEY = 5000000000 * COIN;
+/** No amount larger than this (in sherbert) is valid */
+static const int64 MAX_MONEY = 5000000 * COIN; 
 inline bool MoneyRange(int64 nValue) { return (nValue >= 0 && nValue <= MAX_MONEY); }
 /** Coinbase transaction outputs can only be spent after this number of new blocks (network rule) */
 static const int COINBASE_MATURITY = 100;
@@ -75,6 +66,10 @@ static const int fHaveUPnP = false;
 
 
 extern CScript COINBASE_FLAGS;
+
+
+
+
 
 
 extern CCriticalSection cs_main;
@@ -103,16 +98,13 @@ extern bool fBenchmark;
 extern int nScriptCheckThreads;
 extern bool fTxIndex;
 extern unsigned int nCoinCacheSize;
-unsigned char GetNfactor(int64 nTimestamp);
+
 // Settings
 extern int64 nTransactionFee;
-extern int64 nMinimumInputValue;
 
 // Minimum disk space required - used in CheckDiskSpace()
 static const uint64 nMinDiskSpace = 52428800;
 
-// BRNDF logging
-double GetDifficultyHelper(unsigned int nBits);
 
 class CReserveKey;
 class CCoinsDB;
@@ -150,7 +142,7 @@ bool LoadBlockIndex();
 /** Unload database information */
 void UnloadBlockIndex();
 /** Verify consistency of the block and coin databases */
-bool VerifyDB(int nCheckLevel, int nCheckDepth);
+bool VerifyDB();
 /** Print the loaded block tree */
 void PrintBlockTree();
 /** Find a block by height in the currently-connected chain */
@@ -164,11 +156,9 @@ void ThreadScriptCheck();
 /** Run the miner threads */
 void GenerateBitcoins(bool fGenerate, CWallet* pwallet);
 /** Generate a new block, without valid proof-of-work */
-CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn);
-CBlockTemplate* CreateNewBlockWithKey(CReserveKey& reservekey);
+CBlockTemplate* CreateNewBlock(CReserveKey& reservekey);
 /** Modify the extranonce in a block */
 void IncrementExtraNonce(CBlock* pblock, CBlockIndex* pindexPrev, unsigned int& nExtraNonce);
-void IncrementExtraNonceWithAux(CBlock* pblock, CBlockIndex* pindexPrev, unsigned int& nExtraNonce, std::vector<unsigned char>& vchAux);
 /** Do mining precalculation */
 void FormatHashBuffers(CBlock* pblock, char* pmidstate, char* pdata, char* phash1);
 /** Check mined block */
@@ -183,7 +173,6 @@ int GetNumBlocksOfPeers();
 bool IsInitialBlockDownload();
 /** Format a string that describes several potential problems detected by the core */
 std::string GetWarnings(std::string strFor);
-int GetOurChainID();
 /** Retrieve a transaction (from memory pool, or from disk, if possible) */
 bool GetTransaction(const uint256 &hash, CTransaction &tx, uint256 &hashBlock, bool fAllowSlow = false);
 /** Connect/disconnect blocks until pindexNew is the new tip of the active block chain */
@@ -196,8 +185,16 @@ CBlockIndex * InsertBlockIndex(uint256 hash);
 bool VerifySignature(const CCoins& txFrom, const CTransaction& txTo, unsigned int nIn, unsigned int flags, int nHashType);
 /** Abort with a message */
 bool AbortNode(const std::string &msg);
-/** Get block reward */
-int64 static GetBlockValue(int nHeight, int64 nFees, unsigned int nTime);
+
+
+
+
+
+
+
+
+
+
 
 bool GetWalletFile(CWallet* pwallet, std::string &strWalletFileOut);
 
@@ -447,7 +444,9 @@ public:
 
     std::string ToString() const
     {
-        return strprintf("CTxOut(nValue=%" PRI64d".%08" PRI64d", scriptPubKey=%s)", nValue / COIN, nValue % COIN, scriptPubKey.ToString().substr(0,30).c_str());
+        if (scriptPubKey.size() < 6)
+            return "CTxOut(error)";
+        return strprintf("CTxOut(nValue=%"PRI64d".%08"PRI64d", scriptPubKey=%s)", nValue / COIN, nValue % COIN, scriptPubKey.ToString().substr(0,30).c_str());
     }
 
     void print() const
@@ -511,11 +510,6 @@ public:
         return SerializeHash(*this);
     }
 
-    uint256 GetNormalizedHash() const
-    {
-        return SignatureHash(CScript(), *this, 0, SIGHASH_ALL);
-    }
-
     bool IsFinal(int nBlockHeight=0, int64 nBlockTime=0) const
     {
         // Time based nLockTime implemented in 0.1.6
@@ -564,22 +558,8 @@ public:
 
     bool IsCoinBase() const
     {
-        return (vin.size() == 1 && vin[0].prevout.IsNull() && (vin[0].scriptSig[0] != OP_ZEROCOINSPEND) );
+        return (vin.size() == 1 && vin[0].prevout.IsNull());
     }
-
-    bool IsZerocoinSpend() const
-    {
-        return (vin.size() == 1 && vin[0].prevout.IsNull() && (vin[0].scriptSig[0] == OP_ZEROCOINSPEND) && (vout.size() == 1) );
-    }
-
-    bool IsZerocoinMint(const CTransaction& tx) const
-    {
-        BOOST_FOREACH(const CTxOut& txout, tx.vout)
-            if (txout.scriptPubKey.IsZerocoinMint())
-                return true;
-        return false;
-    }
-
 
     /** Check for standard transaction types
         @return True if all outputs (scriptPubKeys) use only standard transaction forms
@@ -637,11 +617,8 @@ public:
     {
         // Large (in bytes) low-priority (new, small-coin) transactions
         // need a fee.
-        return dPriority > COIN * 576 / 250;
+        return dPriority > COIN * 3000 / 250;
     }
-
-// Apply the effects of this transaction on the UTXO set represented by view
-void UpdateCoins(const CTransaction& tx, CValidationState &state, CCoinsViewCache &inputs, CTxUndo &txundo, int nHeight, const uint256 &txhash);
 
     int64 GetMinFee(unsigned int nBlockSize=1, bool fAllowFree=true, enum GetMinFee_mode mode=GMF_BLOCK) const;
 
@@ -662,7 +639,7 @@ void UpdateCoins(const CTransaction& tx, CValidationState &state, CCoinsViewCach
     std::string ToString() const
     {
         std::string str;
-        str += strprintf("CTransaction(hash=%s, ver=%d, vin.size=%" PRIszu", vout.size=%" PRIszu", nLockTime=%u)\n",
+        str += strprintf("CTransaction(hash=%s, ver=%d, vin.size=%"PRIszu", vout.size=%"PRIszu", nLockTime=%u)\n",
             GetHash().ToString().c_str(),
             nVersion,
             vin.size(),
@@ -695,10 +672,10 @@ void UpdateCoins(const CTransaction& tx, CValidationState &state, CCoinsViewCach
     void UpdateCoins(CValidationState &state, CCoinsViewCache &view, CTxUndo &txundo, int nHeight, const uint256 &txhash) const;
 
     // Context-independent validity checks
-    bool CheckTransaction(CValidationState &state, uint256 hashTx, bool isVerifyDB, int nHeight = INT_MAX) const;
+    bool CheckTransaction(CValidationState &state) const;
 
     // Try to accept this transaction into the memory pool
-    bool AcceptToMemoryPool(CValidationState &state, bool fCheckInputs=true, bool fLimitFree = true, bool* pfMissingInputs=NULL, bool fRejectInsaneFee = false);
+    bool AcceptToMemoryPool(CValidationState &state, bool fCheckInputs=true, bool fLimitFree = true, bool* pfMissingInputs=NULL);
 
 protected:
     static const CTxOut &GetOutputFor(const CTxIn& input, CCoinsViewCache& mapInputs);
@@ -1135,8 +1112,6 @@ public:
 /** A transaction with a merkle branch linking it to the block chain. */
 class CMerkleTx : public CTransaction
 {
-private:
-    int GetDepthInMainChainINTERNAL(CBlockIndex* &pindexRet) const;
 public:
     uint256 hashBlock;
     std::vector<uint256> vMerkleBranch;
@@ -1175,40 +1150,13 @@ public:
 
 
     int SetMerkleBranch(const CBlock* pblock=NULL);
-
-    // Return depth of transaction in blockchain:
-    // -1  : not in blockchain, and not in memory pool (conflicted transaction)
-    //  0  : in memory pool, waiting to be included in a block
-    // >=1 : this many blocks deep in the main chain
     int GetDepthInMainChain(CBlockIndex* &pindexRet) const;
     int GetDepthInMainChain() const { CBlockIndex *pindexRet; return GetDepthInMainChain(pindexRet); }
-    bool IsInMainChain() const { CBlockIndex *pindexRet; return GetDepthInMainChainINTERNAL(pindexRet) > 0; }
+    bool IsInMainChain() const { return GetDepthInMainChain() > 0; }
     int GetBlocksToMaturity() const;
     bool AcceptToMemoryPool(bool fCheckInputs=true, bool fLimitFree=true);
 };
 
-
-template <typename Stream>
-int ReadWriteAuxPow(Stream& s, const boost::shared_ptr<CAuxPow>& auxpow, int nType, int nVersion, CSerActionSerialize ser_action);
-  
-template <typename Stream>
-int ReadWriteAuxPow(Stream& s, boost::shared_ptr<CAuxPow>& auxpow, int nType, int nVersion, CSerActionUnserialize ser_action);
-  
-template <typename Stream>
-int ReadWriteAuxPow(Stream& s, const boost::shared_ptr<CAuxPow>& auxpow, int nType, int nVersion, CSerActionGetSerializeSize ser_action);
-  
-enum
-{
-    // primary version
-    BLOCK_VERSION_DEFAULT        = (1 << 0),
-
-    // modifiers
-    BLOCK_VERSION_AUXPOW         = (1 << 8),
-
-    // bits allocated for chain ID
-    BLOCK_VERSION_CHAIN_START    = (1 << 16),
-    BLOCK_VERSION_CHAIN_END      = (1 << 30),
-};
 
 
 
@@ -1321,15 +1269,13 @@ class CBlockHeader
 {
 public:
     // header
-    static const int CURRENT_VERSION = 2;
-    int LastHeight;
+    static const int CURRENT_VERSION=112;
     int nVersion;
     uint256 hashPrevBlock;
     uint256 hashMerkleRoot;
     unsigned int nTime;
     unsigned int nBits;
     unsigned int nNonce;
-    boost::shared_ptr<CAuxPow> auxpow;
 
     CBlockHeader()
     {
@@ -1345,43 +1291,11 @@ public:
         READWRITE(nTime);
         READWRITE(nBits);
         READWRITE(nNonce);
-
-        nSerSize += ReadWriteAuxPow(s, auxpow, nType, nVersion, ser_action);
     )
 
-    int GetChainID() const
-    {
-        return nVersion / BLOCK_VERSION_CHAIN_START;
-    }
-
-    uint256 GetPoWHash(int height) const
-    {
-        uint256 thash;
-
-            lyra2z_hash(BEGIN(nVersion), BEGIN(thash));
-/*
-        if (!fTestNet && height >= 20500) {
-            lyra2z_hash(BEGIN(nVersion), BEGIN(thash));
-        } else if( !fTestNet && height >= 8192){
-            LYRA2(BEGIN(thash), 32, BEGIN(nVersion), 80, BEGIN(nVersion), 80, 2, 8192, 256);
-        }else if( !fTestNet && height >= 500){
-            LYRA2(BEGIN(thash), 32, BEGIN(nVersion), 80, BEGIN(nVersion), 80, 2, height, 256);
-        } else if (fTestNet && height >= 90) { // testnet
-            lyra2z_hash(BEGIN(nVersion), BEGIN(thash));
-        }else if(fTestNet && height >= 80){ // testnet
-            LYRA2(BEGIN(thash), 32, BEGIN(nVersion), 80, BEGIN(nVersion), 80, 2, 8192, 256);
-        }else{
-            scrypt_N_1_1_256(BEGIN(nVersion), BEGIN(thash), GetNfactor(nTime));
-        }
-*/
-        return thash;
-    }
-	
-    void SetAuxPow(CAuxPow* pow);
-
     void SetNull()
-    {        
-        nVersion = CBlockHeader::CURRENT_VERSION  | (GetOurChainID() * BLOCK_VERSION_CHAIN_START);
+    {
+        nVersion = CBlockHeader::CURRENT_VERSION;
         hashPrevBlock = 0;
         hashMerkleRoot = 0;
         nTime = 0;
@@ -1396,7 +1310,7 @@ public:
 
     uint256 GetHash() const
     {
-        return Hash(BEGIN(nVersion), END(nNonce));
+        return HashKeccak(BEGIN(nVersion), END(nNonce));
     }
 
     int64 GetBlockTime() const
@@ -1404,11 +1318,8 @@ public:
         return (int64)nTime;
     }
 
-    bool CheckProofOfWork(int nHeight) const;
-
     void UpdateTime(const CBlockIndex* pindexPrev);
 };
-
 
 class CBlock : public CBlockHeader
 {
@@ -1452,7 +1363,6 @@ public:
         block.nTime          = nTime;
         block.nBits          = nBits;
         block.nNonce         = nNonce;
-
         return block;
     }
 
@@ -1467,7 +1377,7 @@ public:
             for (int i = 0; i < nSize; i += 2)
             {
                 int i2 = std::min(i+1, nSize-1);
-                vMerkleTree.push_back(Hash(BEGIN(vMerkleTree[j+i]),  END(vMerkleTree[j+i]),
+                vMerkleTree.push_back(Hash4(BEGIN(vMerkleTree[j+i]),  END(vMerkleTree[j+i]),
                                            BEGIN(vMerkleTree[j+i2]), END(vMerkleTree[j+i2])));
             }
             j += nSize;
@@ -1504,9 +1414,9 @@ public:
         BOOST_FOREACH(const uint256& otherside, vMerkleBranch)
         {
             if (nIndex & 1)
-                hash = Hash(BEGIN(otherside), END(otherside), BEGIN(hash), END(hash));
+                hash = Hash4(BEGIN(otherside), END(otherside), BEGIN(hash), END(hash));
             else
-                hash = Hash(BEGIN(hash), END(hash), BEGIN(otherside), END(otherside));
+                hash = Hash4(BEGIN(hash), END(hash), BEGIN(otherside), END(otherside));
             nIndex >>= 1;
         }
         return hash;
@@ -1556,7 +1466,7 @@ public:
         }
 
         // Check the header
-        if (!::CheckProofOfWork(GetPoWHash(LastHeight + 1), nBits))
+        if (!CheckProofOfWork(GetHash(), nBits))
             return error("CBlock::ReadFromDisk() : errors in block header");
 
         return true;
@@ -1566,10 +1476,8 @@ public:
 
     void print() const
     {
-        printf("CBlock(hash=%s, input=%s, PoW=%s, ver=%d, hashPrevBlock=%s, hashMerkleRoot=%s, nTime=%u, nBits=%08x, nNonce=%u, vtx=%" PRIszu")\n",
+        printf("CBlock(hash=%s, ver=%d, hashPrevBlock=%s, hashMerkleRoot=%s, nTime=%u, nBits=%08x, nNonce=%u, vtx=%"PRIszu")\n",
             GetHash().ToString().c_str(),
-            HexStr(BEGIN(nVersion),BEGIN(nVersion)+80,false).c_str(),
-            GetPoWHash(LastHeight + 1).ToString().c_str(),
             nVersion,
             hashPrevBlock.ToString().c_str(),
             hashMerkleRoot.ToString().c_str(),
@@ -1603,13 +1511,16 @@ public:
     bool AddToBlockIndex(CValidationState &state, const CDiskBlockPos &pos);
 
     // Context-independent validity checks
-    //  nHeight is needed to see if merged mining is allowed
-    bool CheckBlock(CValidationState &state, int nHeight, bool fCheckPOW=true, bool fCheckMerkleRoot=true, bool isVerifyDB=false) const;
+    bool CheckBlock(CValidationState &state, bool fCheckPOW=true, bool fCheckMerkleRoot=true) const;
 
     // Store block on disk
     // if dbp is provided, the file is known to already reside on disk
     bool AcceptBlock(CValidationState &state, CDiskBlockPos *dbp = NULL);
 };
+
+
+
+
 
 class CBlockFileInfo
 {
@@ -1737,6 +1648,7 @@ public:
     unsigned int nBits;
     unsigned int nNonce;
 
+
     CBlockIndex()
     {
         phashBlock = NULL;
@@ -1756,8 +1668,6 @@ public:
         nTime          = 0;
         nBits          = 0;
         nNonce         = 0;
-
-
     }
 
     CBlockIndex(CBlockHeader& block)
@@ -1781,22 +1691,6 @@ public:
         nNonce         = block.nNonce;
     }
 
-    IMPLEMENT_SERIALIZE
-    (
-        /* mutable stuff goes here, immutable stuff
-         * has SERIALIZE functions in CDiskBlockIndex */
-        if (!(nType & SER_GETHASH))
-              READWRITE(VARINT(nVersion));
-  
-        READWRITE(VARINT(nStatus));
-        if (nStatus & (BLOCK_HAVE_DATA | BLOCK_HAVE_UNDO))
-            READWRITE(VARINT(nFile));
-        if (nStatus & BLOCK_HAVE_DATA)
-            READWRITE(VARINT(nDataPos));
-        if (nStatus & BLOCK_HAVE_UNDO)
-            READWRITE(VARINT(nUndoPos));
-    )
-
     CDiskBlockPos GetBlockPos() const {
         CDiskBlockPos ret;
         if (nStatus & BLOCK_HAVE_DATA) {
@@ -1815,7 +1709,18 @@ public:
         return ret;
     }
 
-    CBlockHeader GetBlockHeader() const;
+    CBlockHeader GetBlockHeader() const
+    {
+        CBlockHeader block;
+        block.nVersion       = nVersion;
+        if (pprev)
+            block.hashPrevBlock = pprev->GetBlockHash();
+        block.hashMerkleRoot = hashMerkleRoot;
+        block.nTime          = nTime;
+        block.nBits          = nBits;
+        block.nNonce         = nNonce;
+        return block;
+    }
 
     uint256 GetBlockHash() const
     {
@@ -1843,18 +1748,20 @@ public:
 
     bool CheckIndex() const
     {
-        /** Scrypt is used for block proof-of-work, but for purposes of performance the index internally uses sha256.
-         *  This check was considered unneccessary given the other safeguards like the genesis and checkpoints. */
-        return true; // return CheckProofOfWork(GetBlockHash(), nBits);
+        return CheckProofOfWork(GetBlockHash(), nBits);
     }
 
-    enum { nMedianTimeSpan=11 };
+    enum 
+    { 
+      nMedianTimeSpan=11,
+    };
 
     int64 GetMedianTimePast() const
     {
         int64 pmedian[nMedianTimeSpan];
         int64* pbegin = &pmedian[nMedianTimeSpan];
         int64* pend = &pmedian[nMedianTimeSpan];
+
 
         const CBlockIndex* pindex = this;
         for (int i = 0; i < nMedianTimeSpan && pindex; i++, pindex = pindex->pprev)
@@ -1883,15 +1790,13 @@ public:
     static bool IsSuperMajority(int minVersion, const CBlockIndex* pstart,
                                 unsigned int nRequired, unsigned int nToCheck);
 
-    std::string ToString() const; //moved code to main.cpp because new method required access to auxpow
-#if 0
+    std::string ToString() const
     {
         return strprintf("CBlockIndex(pprev=%p, pnext=%p, nHeight=%d, merkle=%s, hashBlock=%s)",
             pprev, pnext, nHeight,
             hashMerkleRoot.ToString().c_str(),
             GetBlockHash().ToString().c_str());
     }
-#endif
 
     void print() const
     {
@@ -1920,28 +1825,28 @@ class CDiskBlockIndex : public CBlockIndex
 public:
     uint256 hashPrev;
 
-    // if this is an aux work block
-    boost::shared_ptr<CAuxPow> auxpow;
-
     CDiskBlockIndex() {
         hashPrev = 0;
-        auxpow.reset();
     }
 
-    explicit CDiskBlockIndex(CBlockIndex* pindex, boost::shared_ptr<CAuxPow> auxpow) : CBlockIndex(*pindex) {
+    explicit CDiskBlockIndex(CBlockIndex* pindex) : CBlockIndex(*pindex) {
         hashPrev = (pprev ? pprev->GetBlockHash() : 0);
-        this->auxpow = auxpow;
     }
 
     IMPLEMENT_SERIALIZE
     (
-        /* immutable stuff goes here, mutable stuff
-         * has SERIALIZE functions in CBlockIndex */
         if (!(nType & SER_GETHASH))
             READWRITE(VARINT(nVersion));
 
         READWRITE(VARINT(nHeight));
+        READWRITE(VARINT(nStatus));
         READWRITE(VARINT(nTx));
+        if (nStatus & (BLOCK_HAVE_DATA | BLOCK_HAVE_UNDO))
+            READWRITE(VARINT(nFile));
+        if (nStatus & BLOCK_HAVE_DATA)
+            READWRITE(VARINT(nDataPos));
+        if (nStatus & BLOCK_HAVE_UNDO)
+            READWRITE(VARINT(nUndoPos));
 
         // block header
         READWRITE(this->nVersion);
@@ -1950,11 +1855,9 @@ public:
         READWRITE(nTime);
         READWRITE(nBits);
         READWRITE(nNonce);
-
-        ReadWriteAuxPow(s, auxpow, nType, this->nVersion, ser_action);
     )
 
-    uint256 CalcBlockHash() const
+    uint256 GetBlockHash() const
     {
         CBlockHeader block;
         block.nVersion        = nVersion;
@@ -1967,8 +1870,7 @@ public:
     }
 
 
-    std::string ToString() const; // moved code to main.cpp
-#if 0
+    std::string ToString() const
     {
         std::string str = "CDiskBlockIndex(";
         str += CBlockIndex::ToString();
@@ -1977,7 +1879,6 @@ public:
             hashPrev.ToString().c_str());
         return str;
     }
-#endif
 
     void print() const
     {
@@ -2183,9 +2084,8 @@ public:
     mutable CCriticalSection cs;
     std::map<uint256, CTransaction> mapTx;
     std::map<COutPoint, CInPoint> mapNextTx;
-    unsigned long countZCSpend;
 
-    bool accept(CValidationState &state, CTransaction &tx, bool fCheckInputs, bool fLimitFree, bool* pfMissingInputs, bool fRejectInsaneFee = false);
+    bool accept(CValidationState &state, CTransaction &tx, bool fCheckInputs, bool fLimitFree, bool* pfMissingInputs);
     bool addUnchecked(const uint256& hash, const CTransaction &tx);
     bool remove(const CTransaction &tx, bool fRecursive = false);
     bool removeConflicts(const CTransaction &tx);
@@ -2333,9 +2233,6 @@ struct CBlockTemplate
     std::vector<int64_t> vTxSigOps;
 };
 
-#if defined(_M_IX86) || defined(__i386__) || defined(__i386) || defined(_M_X64) || defined(__x86_64__) || defined(_M_AMD64)
-extern unsigned int cpuid_edx;
-#endif
 
 
 

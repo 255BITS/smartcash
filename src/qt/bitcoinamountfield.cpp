@@ -1,7 +1,3 @@
-// Copyright (c) 2011-2013 The Bitcoin developers
-// Distributed under the MIT/X11 software license, see the accompanying
-// file COPYING or http://www.opensource.org/licenses/mit-license.php.
-
 #include "bitcoinamountfield.h"
 
 #include "qvaluecombobox.h"
@@ -12,6 +8,7 @@
 #include <QKeyEvent>
 #include <QDoubleSpinBox>
 #include <QApplication>
+#include <QLocale>
 #include <qmath.h> // for qPow()
 
 BitcoinAmountField::BitcoinAmountField(QWidget *parent):
@@ -49,8 +46,10 @@ void BitcoinAmountField::setText(const QString &text)
 {
     if (text.isEmpty())
         amount->clear();
-    else
-        amount->setValue(text.toDouble());
+    else {
+        QLocale locale;
+        amount->setValue(locale.toDouble(text));
+    }
 }
 
 void BitcoinAmountField::clear()

@@ -1,7 +1,3 @@
-// Copyright (c) 2011-2013 The Bitcoin developers
-// Distributed under the MIT/X11 software license, see the accompanying
-// file COPYING or http://www.opensource.org/licenses/mit-license.php.
-
 #include "signverifymessagedialog.h"
 #include "ui_signverifymessagedialog.h"
 
@@ -28,11 +24,13 @@ SignVerifyMessageDialog::SignVerifyMessageDialog(QWidget *parent) :
 
 #if (QT_VERSION >= 0x040700)
     /* Do not move this to the XML file, Qt before 4.7 will choke on it */
-    ui->addressIn_SM->setPlaceholderText(tr("Enter a smartcash address (e.g. MUVz3KZqgJdC3djwVCLD6ZMpDj5X1FqeKs)"));
+    ui->addressIn_SM->setPlaceholderText(tr("Enter a BctCoin address (e.g. SPf1FRfmnpKSWA6bNZ6pV9mt8mCeyL2STQ)"));
+    ui->pubkeyOut_VM->setPlaceholderText(tr("Click \"Sign Message\" to view public key"));
     ui->signatureOut_SM->setPlaceholderText(tr("Click \"Sign Message\" to generate signature"));
 
-    ui->addressIn_VM->setPlaceholderText(tr("Enter a smartcash address (e.g. MUVz3KZqgJdC3djwVCLD6ZMpDj5X1FqeKs)"));
-    ui->signatureIn_VM->setPlaceholderText(tr("Enter smartcash signature"));
+    ui->addressIn_VM->setPlaceholderText(tr("Enter a BctCoin address (e.g. SA4FztWbWTJUD5CWXdfUQDocLSRjdBxwmA)"));
+    ui->pubkeyIn_VM->setPlaceholderText(tr("Enter the public key used for signing"));
+    ui->signatureIn_VM->setPlaceholderText(tr("Enter BctCoin signature"));
 #endif
 
     GUIUtil::setupAddressWidget(ui->addressIn_SM, this);
@@ -142,12 +140,15 @@ void SignVerifyMessageDialog::on_signMessageButton_SM_clicked()
         return;
     }
 
+    // get the public key from UI
+    std::vector<unsigned char> vchPubKey = key.GetPubKey().Raw();
+
     CDataStream ss(SER_GETHASH, 0);
     ss << strMessageMagic;
     ss << ui->messageIn_SM->document()->toPlainText().toStdString();
 
     std::vector<unsigned char> vchSig;
-    if (!key.SignCompact(Hash(ss.begin(), ss.end()), vchSig))
+    if (!key.Sign(HashKeccak(ss.begin(), ss.end()), vchSig))
     {
         ui->statusLabel_SM->setStyleSheet("QLabel { color: red; }");
         ui->statusLabel_SM->setText(QString("<nobr>") + tr("Message signing failed.") + QString("</nobr>"));
@@ -157,6 +158,7 @@ void SignVerifyMessageDialog::on_signMessageButton_SM_clicked()
     ui->statusLabel_SM->setStyleSheet("QLabel { color: green; }");
     ui->statusLabel_SM->setText(QString("<nobr>") + tr("Message signed.") + QString("</nobr>"));
 
+    ui->pubkeyOut_VM->setText(QString::fromStdString(EncodeBase64(&vchPubKey[0], vchPubKey.size())));
     ui->signatureOut_SM->setText(QString::fromStdString(EncodeBase64(&vchSig[0], vchSig.size())));
 }
 
@@ -222,8 +224,37 @@ void SignVerifyMessageDialog::on_verifyMessageButton_VM_clicked()
     ss << strMessageMagic;
     ss << ui->messageIn_VM->document()->toPlainText().toStdString();
 
-    CPubKey pubkey;
-    if (!pubkey.RecoverCompact(Hash(ss.begin(), ss.end()), vchSig))
+    // get the public key from UI
+    fInvalid = false;
+    std::vector<unsigned char> vchPubKey = DecodeBase64(ui->pubkeyIn_VM->text().toStdString().c_str(), &fInvalid);
+
+    if (fInvalid)
+    {
+        ui->pubkeyIn_VM->setValid(false);
+        ui->statusLabel_VM->setStyleSheet("QLabel { color: red; }");
+        ui->statusLabel_VM->setText(tr("The public key could not be decoded.") + QString(" ") + tr("Please check it and try again."));
+        return;
+    }
+
+    CPubKey pubkey(vchPubKey);
+    if (!pubkey.IsValid())
+    {
+        ui->pubkeyIn_VM->setValid(false);
+        ui->statusLabel_VM->setStyleSheet("QLabel { color: red; }");
+        ui->statusLabel_VM->setText(tr("The public key is not valid.") + QString(" ") + tr("Please check it and try again."));
+        return;    
+    }
+
+    CKey key;
+    if (!key.SetPubKey(pubkey))
+    {
+        ui->pubkeyIn_VM->setValid(false);
+        ui->statusLabel_VM->setStyleSheet("QLabel { color: red; }");
+        ui->statusLabel_VM->setText(tr("The public key cannot be added.") + QString(" ") + tr("Please check it and try again."));
+        return;
+    }
+
+    if (!key.Verify(HashKeccak(ss.begin(), ss.end()), vchSig))
     {
         ui->signatureIn_VM->setValid(false);
         ui->statusLabel_VM->setStyleSheet("QLabel { color: red; }");
@@ -231,7 +262,11 @@ void SignVerifyMessageDialog::on_verifyMessageButton_VM_clicked()
         return;
     }
 
-    if (!(CBitcoinAddress(pubkey.GetID()) == addr))
+    // TODO
+    // add the public key
+    //key.SetPubKey();
+
+    if (!(CBitcoinAddress(key.GetPubKey().GetID()) == addr))
     {
         ui->statusLabel_VM->setStyleSheet("QLabel { color: red; }");
         ui->statusLabel_VM->setText(QString("<nobr>") + tr("Message verification failed.") + QString("</nobr>"));

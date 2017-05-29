@@ -1,7 +1,3 @@
-// Copyright (c) 2011-2013 The Bitcoin developers
-// Distributed under the MIT/X11 software license, see the accompanying
-// file COPYING or http://www.opensource.org/licenses/mit-license.php.
-
 #ifndef CLIENTMODEL_H
 #define CLIENTMODEL_H
 
@@ -24,7 +20,7 @@ enum BlockSource {
     BLOCK_SOURCE_NETWORK
 };
 
-/** Model for Bitcoin network client. */
+/** Model for BctCoin network client. */
 class ClientModel : public QObject
 {
     Q_OBJECT
@@ -65,7 +61,7 @@ private:
     int cachedNumBlocks;
     int cachedNumBlocksOfPeers;
 	bool cachedReindexing;
-	bool cachedImporting;
+    bool cachedImporting;
 
     int numBlocksAtStartup;
 
@@ -78,6 +74,9 @@ signals:
     void numConnectionsChanged(int count);
     void numBlocksChanged(int count, int countOfPeers);
     void alertsChanged(const QString &warnings);
+
+    //! Asynchronous error notification
+    void error(const QString &title, const QString &message, bool modal);
 
     //! Asynchronous message notification
     void message(const QString &title, const QString &message, unsigned int style);

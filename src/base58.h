@@ -135,7 +135,7 @@ inline std::string EncodeBase58Check(const std::vector<unsigned char>& vchIn)
 {
     // add 4-byte hash check to the end
     std::vector<unsigned char> vch(vchIn);
-    uint256 hash = Hash(vch.begin(), vch.end());
+    uint256 hash = HashKeccak(vch.begin(), vch.end());
     vch.insert(vch.end(), (unsigned char*)&hash, (unsigned char*)&hash + 4);
     return EncodeBase58(vch);
 }
@@ -151,7 +151,7 @@ inline bool DecodeBase58Check(const char* psz, std::vector<unsigned char>& vchRe
         vchRet.clear();
         return false;
     }
-    uint256 hash = Hash(vchRet.begin(), vchRet.end()-4);
+    uint256 hash = HashKeccak(vchRet.begin(), vchRet.end()-4);
     if (memcmp(&hash, &vchRet.end()[-4], 4) != 0)
     {
         vchRet.clear();
@@ -272,10 +272,10 @@ class CBitcoinAddress : public CBase58Data
 public:
     enum
     {
-        PUBKEY_ADDRESS = 63, // smartcash addresses start with S
-        SCRIPT_ADDRESS = 18, // smartcash scrypts start wth 8
-        PUBKEY_ADDRESS_TEST = 65, // smartcash testnet keys start with T
-        SCRIPT_ADDRESS_TEST = 21, // smartcash testnet scripts start with 9
+        PUBKEY_ADDRESS = 10, // B
+        SCRIPT_ADDRESS = 125, // s
+        PUBKEY_ADDRESS_TEST = 127, // t
+        SCRIPT_ADDRESS_TEST = 130, // u
     };
 
     bool Set(const CKeyID &id) {
@@ -398,25 +398,21 @@ bool inline CBitcoinAddressVisitor::operator()(const CNoDestination &id) const {
 class CBitcoinSecret : public CBase58Data
 {
 public:
-    enum
+    void SetSecret(const CSecret& vchSecret, bool fCompressed)
     {
-        PRIVKEY_ADDRESS = CBitcoinAddress::PUBKEY_ADDRESS + 128,
-        PRIVKEY_ADDRESS_TEST = CBitcoinAddress::PUBKEY_ADDRESS_TEST + 128,
-    };
-
-    void SetKey(const CKey& vchSecret)
-    {
-        assert(vchSecret.IsValid());
-        SetData(fTestNet ? PRIVKEY_ADDRESS_TEST : PRIVKEY_ADDRESS, vchSecret.begin(), vchSecret.size());
-        if (vchSecret.IsCompressed())
+        assert(vchSecret.size() == 32);
+        SetData(fTestNet ? 239 : 128, &vchSecret[0], vchSecret.size());
+        if (fCompressed)
             vchData.push_back(1);
     }
 
-    CKey GetKey()
+    CSecret GetSecret(bool &fCompressedOut)
     {
-        CKey ret;
-        ret.Set(&vchData[0], &vchData[32], vchData.size() > 32 && vchData[32] == 1);
-        return ret;
+        CSecret vchSecret;
+        vchSecret.resize(32);
+        memcpy(&vchSecret[0], &vchData[0], 32);
+        fCompressedOut = vchData.size() == 33;
+        return vchSecret;
     }
 
     bool IsValid() const
@@ -424,10 +420,10 @@ public:
         bool fExpectTestNet = false;
         switch(nVersion)
         {
-            case PRIVKEY_ADDRESS:
+            case 128:
                 break;
 
-            case PRIVKEY_ADDRESS_TEST:
+            case 239:
                 fExpectTestNet = true;
                 break;
 
@@ -447,9 +443,9 @@ public:
         return SetString(strSecret.c_str());
     }
 
-    CBitcoinSecret(const CKey& vchSecret)
+    CBitcoinSecret(const CSecret& vchSecret, bool fCompressed)
     {
-        SetKey(vchSecret);
+        SetSecret(vchSecret, fCompressed);
     }
 
     CBitcoinSecret()

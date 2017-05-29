@@ -11,8 +11,6 @@
 class CKeyPool;
 class CAccount;
 class CAccountingEntry;
-class CZerocoinEntry;
-class CZerocoinSpendEntry;
 
 /** Error statuses for the wallet database */
 enum DBErrors
@@ -52,21 +50,21 @@ public:
         return Erase(std::make_pair(std::string("tx"), hash));
     }
 
-    bool WriteKey(const CPubKey& vchPubKey, const CPrivKey& vchPrivKey)
+    bool WriteKey(const CPubKey& vchPubKey, const CSecret& vchPrivKey)
     {
         nWalletDBUpdated++;
-        return Write(std::make_pair(std::string("key"), vchPubKey), vchPrivKey, false);
+        return Write(std::make_pair(std::string("key"), vchPubKey.Raw()), vchPrivKey, false);
     }
 
     bool WriteCryptedKey(const CPubKey& vchPubKey, const std::vector<unsigned char>& vchCryptedSecret, bool fEraseUnencryptedKey = true)
     {
         nWalletDBUpdated++;
-        if (!Write(std::make_pair(std::string("ckey"), vchPubKey), vchCryptedSecret, false))
+        if (!Write(std::make_pair(std::string("ckey"), vchPubKey.Raw()), vchCryptedSecret, false))
             return false;
         if (fEraseUnencryptedKey)
         {
-            Erase(std::make_pair(std::string("key"), vchPubKey));
-            Erase(std::make_pair(std::string("wkey"), vchPubKey));
+            Erase(std::make_pair(std::string("key"), vchPubKey.Raw()));
+            Erase(std::make_pair(std::string("wkey"), vchPubKey.Raw()));
         }
         return true;
     }
@@ -103,7 +101,7 @@ public:
     bool WriteDefaultKey(const CPubKey& vchPubKey)
     {
         nWalletDBUpdated++;
-        return Write(std::string("defaultkey"), vchPubKey);
+        return Write(std::string("defaultkey"), vchPubKey.Raw());
     }
 
     bool ReadPool(int64 nPool, CKeyPool& keypool)
@@ -156,24 +154,10 @@ public:
     int64 GetAccountCreditDebit(const std::string& strAccount);
     void ListAccountCreditDebit(const std::string& strAccount, std::list<CAccountingEntry>& acentries);
 
-    bool WriteZerocoinEntry(const CZerocoinEntry& zerocoin);
-    bool EarseZerocoinEntry(const CZerocoinEntry& zerocoin);
-    void ListPubCoin(std::list<CZerocoinEntry>& listPubCoin);
-    void ListCoinSpendSerial(std::list<CZerocoinSpendEntry>& listCoinSpendSerial);
-    bool WriteCoinSpendSerialEntry(const CZerocoinSpendEntry& zerocoinSpend);
-    bool EarseCoinSpendSerialEntry(const CZerocoinSpendEntry& zerocoinSpend);
-    bool WriteZerocoinAccumulator(libzerocoin::Accumulator accumulator, libzerocoin::CoinDenomination denomination);
-    bool ReadZerocoinAccumulator(libzerocoin::Accumulator& accumulator, libzerocoin::CoinDenomination denomination);
-
-    bool ReadCalculatedZCBlock(int& height);
-    bool WriteCalculatedZCBlock(int height);
-
     DBErrors ReorderTransactions(CWallet*);
     DBErrors LoadWallet(CWallet* pwallet);
     static bool Recover(CDBEnv& dbenv, std::string filename, bool fOnlyKeys);
     static bool Recover(CDBEnv& dbenv, std::string filename);
-
-
 };
 
 #endif // BITCOIN_WALLETDB_H

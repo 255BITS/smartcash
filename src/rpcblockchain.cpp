@@ -1,23 +1,32 @@
 // Copyright (c) 2010 Satoshi Nakamoto
-// Copyright (c) 2009-2014 The Bitcoin developers
+// Copyright (c) 2009-2012 The Bitcoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "main.h"
 #include "bitcoinrpc.h"
-#include "auxpow.h"
 
 using namespace json_spirit;
 using namespace std;
 
-// from rpcraw.cpp
-void TxToJSON(const CTransaction& tx, const uint256 hashBlock, Object& entry);
-
 void ScriptPubKeyToJSON(const CScript& scriptPubKey, Object& out);
 
-double GetDifficultyHelper(unsigned int nBits) {
-    int nShift = (nBits >> 24) & 0xff;
-    double dDiff = (double)0x0000ffff / (double)(nBits & 0x00ffffff);
+double GetDifficulty(const CBlockIndex* blockindex)
+{
+    // Floating point number that is a multiple of the minimum difficulty,
+    // minimum difficulty = 1.0.
+    if (blockindex == NULL)
+    {
+        if (pindexBest == NULL)
+            return 1.0;
+        else
+            blockindex = pindexBest;
+    }
+
+    int nShift = (blockindex->nBits >> 24) & 0xff;
+
+    double dDiff =
+        (double)0x0000ffff / (double)(blockindex->nBits & 0x00ffffff);
 
     while (nShift < 29)
     {
@@ -33,27 +42,11 @@ double GetDifficultyHelper(unsigned int nBits) {
     return dDiff;
 }
 
-double GetDifficulty(const CBlockIndex* blockindex)
-{
-    // Floating point number that is a multiple of the minimum difficulty,
-    // minimum difficulty = 1.0.
-    if (blockindex == NULL)
-    {
-        if (pindexBest == NULL)
-            return 1.0;
-        else
-            blockindex = pindexBest;
-    }
-
-    return GetDifficultyHelper(blockindex->nBits);
-}
-
 
 Object blockToJSON(const CBlock& block, const CBlockIndex* blockindex)
 {
     Object result;
     result.push_back(Pair("hash", block.GetHash().GetHex()));
-    result.push_back(Pair("pow_hash", block.GetPoWHash(blockindex->nHeight).GetHex()));
     CMerkleTx txGen(block.vtx[0]);
     txGen.SetMerkleBranch(&block);
     result.push_back(Pair("confirmations", (int)txGen.GetDepthInMainChain()));
@@ -61,40 +54,6 @@ Object blockToJSON(const CBlock& block, const CBlockIndex* blockindex)
     result.push_back(Pair("height", blockindex->nHeight));
     result.push_back(Pair("version", block.nVersion));
     result.push_back(Pair("merkleroot", block.hashMerkleRoot.GetHex()));
-    if (block.nVersion & BLOCK_VERSION_AUXPOW) {
-        // this block includes auxpow
-        Object auxpow;
-        auxpow.push_back(Pair("size", (int)::GetSerializeSize(*block.auxpow, SER_NETWORK, PROTOCOL_VERSION)));
-
-        Object coinbasetx;
-        TxToJSON(*block.auxpow, 0, coinbasetx);
-        auxpow.push_back(Pair("coinbasetx", Value(coinbasetx)));
-
-        Array coinbaseMerkle;
-        BOOST_FOREACH(const uint256 &hash, block.auxpow->vMerkleBranch)
-            coinbaseMerkle.push_back(hash.GetHex());
-        auxpow.push_back(Pair("coinbaseMerkleBranch", coinbaseMerkle));
-        auxpow.push_back(Pair("coinbaseIndex", block.auxpow->nIndex));
-
-        Array chainMerkle;
-        BOOST_FOREACH(const uint256 &hash, block.auxpow->vChainMerkleBranch)
-            chainMerkle.push_back(hash.GetHex());
-        auxpow.push_back(Pair("chainMerkleBranch", chainMerkle));
-        auxpow.push_back(Pair("chainIndex", (boost::uint64_t)block.auxpow->nChainIndex));
-
-        Object parent_block;
-        parent_block.push_back(Pair("hash", block.auxpow->parentBlockHeader.GetHash().GetHex()));
-        parent_block.push_back(Pair("pow_hash", block.auxpow->parentBlockHeader.GetPoWHash(blockindex->nHeight).GetHex()));
-        parent_block.push_back(Pair("version", (boost::uint64_t)block.auxpow->parentBlockHeader.nVersion));
-        parent_block.push_back(Pair("previousblockhash", block.auxpow->parentBlockHeader.hashPrevBlock.GetHex()));
-        parent_block.push_back(Pair("merkleroot", block.auxpow->parentBlockHeader.hashMerkleRoot.GetHex()));
-        parent_block.push_back(Pair("time", (boost::int64_t)block.auxpow->parentBlockHeader.nTime));
-        parent_block.push_back(Pair("bits", HexBits(block.auxpow->parentBlockHeader.nBits)));
-        parent_block.push_back(Pair("difficulty", GetDifficultyHelper(block.auxpow->parentBlockHeader.nBits)));
-        parent_block.push_back(Pair("nonce", (boost::uint64_t)block.auxpow->parentBlockHeader.nNonce));
-        auxpow.push_back(Pair("parent_block", Value(parent_block)));
-        result.push_back(Pair("auxpow", Value(auxpow)));
-    }
     Array txs;
     BOOST_FOREACH(const CTransaction&tx, block.vtx)
         txs.push_back(tx.GetHash().GetHex());
@@ -122,15 +81,6 @@ Value getblockcount(const Array& params, bool fHelp)
     return nBestHeight;
 }
 
-Value getbestblockhash(const Array& params, bool fHelp)
-{
-    if (fHelp || params.size() != 0)
-        throw runtime_error(
-            "getbestblockhash\n"
-            "Returns the hash of the best (tip) block in the longest block chain.");
-
-    return hashBestChain.GetHex();
-}
 
 Value getdifficulty(const Array& params, bool fHelp)
 {
@@ -147,8 +97,8 @@ Value settxfee(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() < 1 || params.size() > 1)
         throw runtime_error(
-            "settxfee <amount SMART/KB>\n"
-            "<amount> is a real and is rounded to the nearest 0.00000001 SMART per KB");
+            "settxfee <amount>\n"
+            "<amount> is a real and is rounded to the nearest 0.00000001");
 
     // Amount
     int64 nAmount = 0;
@@ -193,19 +143,13 @@ Value getblockhash(const Array& params, bool fHelp)
 
 Value getblock(const Array& params, bool fHelp)
 {
-    if (fHelp || params.size() < 1 || params.size() > 2)
+    if (fHelp || params.size() != 1)
         throw runtime_error(
-            "getblock <hash> [verbose=true]\n"
-            "If verbose is false, returns a string that is serialized, hex-encoded data for block <hash>.\n"
-            "If verbose is true, returns an Object with information about block <hash>."
-        );
+            "getblock <hash>\n"
+            "Returns details of a block with given block-hash.");
 
     std::string strHash = params[0].get_str();
     uint256 hash(strHash);
-
-    bool fVerbose = true;
-    if (params.size() > 1)
-        fVerbose = params[1].get_bool();
 
     if (mapBlockIndex.count(hash) == 0)
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Block not found");
@@ -213,14 +157,6 @@ Value getblock(const Array& params, bool fHelp)
     CBlock block;
     CBlockIndex* pblockindex = mapBlockIndex[hash];
     block.ReadFromDisk(pblockindex);
-
-    if (!fVerbose)
-    {
-        CDataStream ssBlock(SER_NETWORK, PROTOCOL_VERSION);
-        ssBlock << block;
-        std::string strHex = HexStr(ssBlock.begin(), ssBlock.end());
-        return strHex;
-    }
 
     return blockToJSON(block, pblockindex);
 }
@@ -292,20 +228,4 @@ Value gettxout(const Array& params, bool fHelp)
     return ret;
 }
 
-Value verifychain(const Array& params, bool fHelp)
-{
-    if (fHelp || params.size() > 2)
-        throw runtime_error(
-            "verifychain [check level] [num blocks]\n"
-            "Verifies blockchain database.");
-
-    int nCheckLevel = GetArg("-checklevel", 3);
-    int nCheckDepth = GetArg("-checkblocks", 288);
-    if (params.size() > 0)
-        nCheckLevel = params[0].get_int();
-    if (params.size() > 1)
-        nCheckDepth = params[1].get_int();
-
-    return VerifyDB(nCheckLevel, nCheckDepth);
-}
 

@@ -1,5 +1,5 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
-// Copyright (c) 2009-2014 The Bitcoin developers
+// Copyright (c) 2009-2012 The Bitcoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 #ifndef BITCOIN_WALLET_H
@@ -18,13 +18,10 @@
 #include "util.h"
 #include "walletdb.h"
 
-extern bool bSpendZeroConfChange;
-
 class CAccountingEntry;
 class CWalletTx;
 class CReserveKey;
 class COutput;
-class CCoinControl;
 
 /** (client) version numbers for particular wallet features */
 enum WalletFeature
@@ -71,7 +68,7 @@ public:
 class CWallet : public CCryptoKeyStore
 {
 private:
-    bool SelectCoins(int64 nTargetValue, std::set<std::pair<const CWalletTx*,unsigned int> >& setCoinsRet, int64& nValueRet, const CCoinControl *coinControl=NULL) const;
+    bool SelectCoins(int64 nTargetValue, std::set<std::pair<const CWalletTx*,unsigned int> >& setCoinsRet, int64& nValueRet) const;
 
     CWalletDB *pwalletdbEncryption;
 
@@ -127,8 +124,7 @@ public:
     // check whether we are allowed to upgrade (or already support) to the named feature
     bool CanSupportFeature(enum WalletFeature wf) { return nWalletMaxVersion >= wf; }
 
-    void AvailableCoins(std::vector<COutput>& vCoins, bool fOnlyConfirmed=true, const CCoinControl *coinControl=NULL) const;
-    void ListAvailableCoinsMintCoins(std::vector<COutput>& vCoins, bool fOnlyConfirmed=true) const;
+    void AvailableCoins(std::vector<COutput>& vCoins, bool fOnlyConfirmed=true) const;
     bool SelectCoinsMinConf(int64 nTargetValue, int nConfMine, int nConfTheirs, std::vector<COutput> vCoins, std::set<std::pair<const CWalletTx*,unsigned int> >& setCoinsRet, int64& nValueRet) const;
     bool IsLockedCoin(uint256 hash, unsigned int n) const;
     void LockCoin(COutPoint& output);
@@ -140,9 +136,9 @@ public:
     // Generate a new key
     CPubKey GenerateNewKey();
     // Adds a key to the store, and saves it to disk.
-    bool AddKeyPubKey(const CKey& key, const CPubKey &pubkey);
+    bool AddKey(const CKey& key);
     // Adds a key to the store, without saving it to disk (used by LoadWallet)
-    bool LoadKey(const CKey& key, const CPubKey &pubkey) { return CCryptoKeyStore::AddKeyPubKey(key, pubkey); }
+    bool LoadKey(const CKey& key) { return CCryptoKeyStore::AddKey(key); }
 
     bool LoadMinVersion(int nVersion) { nWalletVersion = nVersion; nWalletMaxVersion = std::max(nWalletMaxVersion, nVersion); return true; }
 
@@ -174,7 +170,6 @@ public:
     void MarkDirty();
     bool AddToWallet(const CWalletTx& wtxIn);
     bool AddToWalletIfInvolvingMe(const uint256 &hash, const CTransaction& tx, const CBlock* pblock, bool fUpdate = false, bool fFindBlock = false);
-    void ComputeAccumulatorZerocoin(const uint256 &hash, const CTransaction& tx, const CBlock* pblock, bool fUpdate = false, bool fFindBlock = false);
     bool EraseFromWallet(uint256 hash);
     void WalletUpdateSpent(const CTransaction& prevout);
     int ScanForWalletTransactions(CBlockIndex* pindexStart, bool fUpdate = false);
@@ -184,24 +179,12 @@ public:
     int64 GetUnconfirmedBalance() const;
     int64 GetImmatureBalance() const;
     bool CreateTransaction(const std::vector<std::pair<CScript, int64> >& vecSend,
-                           CWalletTx& wtxNew, CReserveKey& reservekey, int64& nFeeRet, std::string& strFailReason, const CCoinControl *coinControl=NULL);
+                           CWalletTx& wtxNew, CReserveKey& reservekey, int64& nFeeRet, std::string& strFailReason);
     bool CreateTransaction(CScript scriptPubKey, int64 nValue,
-                           CWalletTx& wtxNew, CReserveKey& reservekey, int64& nFeeRet, std::string& strFailReason, const CCoinControl *coinControl=NULL);
-    bool CreateZerocoinMintTransaction(const std::vector<std::pair<CScript, int64> >& vecSend,
-                           CWalletTx& wtxNew, CReserveKey& reservekey, int64& nFeeRet, std::string& strFailReason, const CCoinControl *coinControl=NULL);
-    bool CreateZerocoinMintTransaction(CScript pubCoin, int64 nValue,
-                           CWalletTx& wtxNew, CReserveKey& reservekey, int64& nFeeRet, std::string& strFailReason, const CCoinControl *coinControl=NULL);
-    bool CreateZerocoinSpendTransaction(int64 nValue, libzerocoin::CoinDenomination denomination,
-                                    CWalletTx& wtxNew, CReserveKey& reservekey, CBigNum& coinSerial, uint256& txHash, CBigNum& zcSelectedValue, bool& zcSelectedIsUsed,  std::string& strFailReason);
+                           CWalletTx& wtxNew, CReserveKey& reservekey, int64& nFeeRet, std::string& strFailReason);
     bool CommitTransaction(CWalletTx& wtxNew, CReserveKey& reservekey);
-    bool CommitZerocoinSpendTransaction(CWalletTx& wtxNew, CReserveKey& reservekey);
     std::string SendMoney(CScript scriptPubKey, int64 nValue, CWalletTx& wtxNew, bool fAskFee=false);
     std::string SendMoneyToDestination(const CTxDestination &address, int64 nValue, CWalletTx& wtxNew, bool fAskFee=false);
-    std::string MintZerocoin(CScript pubCoin, int64 nValue, CWalletTx& wtxNew, bool fAskFee=false);
-    std::string SpendZerocoin(int64 nValue, libzerocoin::CoinDenomination denomination, CWalletTx& wtxNew, CBigNum& coinSerial, uint256& txHash, CBigNum& zcSelectedValue, bool& zcSelectedIsUsed);
-    bool CreateZerocoinMintModel(string &stringError, string denomAmount);
-    bool CreateZerocoinSpendModel(string &stringError, string denomAmount);
-
 
     bool NewKeyPool();
     bool TopUpKeyPool();
@@ -237,11 +220,9 @@ public:
     }
     bool IsMine(const CTransaction& tx) const
     {
-        BOOST_FOREACH(const CTxOut& txout, tx.vout){
-            if (IsMine(txout) && txout.nValue >= nMinimumInputValue){
+        BOOST_FOREACH(const CTxOut& txout, tx.vout)
+            if (IsMine(txout))
                 return true;
-            }
-        }
         return false;
     }
     bool IsFromMe(const CTransaction& tx) const
@@ -287,8 +268,6 @@ public:
 
     bool SetAddressBookName(const CTxDestination& address, const std::string& strName);
 
-    bool SetZerocoinBook(const CZerocoinEntry& zerocoinEntry);
-
     bool DelAddressBookName(const CTxDestination& address);
 
     void UpdatedTransaction(const uint256 &hashTx);
@@ -327,12 +306,6 @@ public:
      * @note called with lock cs_wallet held.
      */
     boost::signals2::signal<void (CWallet *wallet, const CTxDestination &address, const std::string &label, bool isMine, ChangeType status)> NotifyAddressBookChanged;
-
-    /** Zerocin entry changed.
-     * @note called with lock cs_wallet held.
-     */
-    boost::signals2::signal<void (CWallet *wallet, const std::string &pubCoin, const std::string &isUsed, ChangeType status)> NotifyZerocoinChanged;
-
 
     /** Wallet transaction added, removed or updated.
      * @note called with lock cs_wallet held.
@@ -668,12 +641,9 @@ public:
         // Quick answer in most cases
         if (!IsFinal())
             return false;
-        int nDepth = GetDepthInMainChain();
-        if (nDepth >= 1)
+        if (GetDepthInMainChain() >= 1)
             return true;
-        if (nDepth < 0)
-            return false;
-        if (!bSpendZeroConfChange || !IsFromMe()) // using wtx's cached debit
+        if (!IsFromMe()) // using wtx's cached debit
             return false;
 
         // If no confirmations but it's from us, we can still
@@ -688,11 +658,8 @@ public:
 
             if (!ptx->IsFinal())
                 return false;
-            int nPDepth = ptx->GetDepthInMainChain();
-            if (nPDepth >= 1)
+            if (ptx->GetDepthInMainChain() >= 1)
                 continue;
-            if (nPDepth < 0)
-                return false;
             if (!pwallet->IsFromMe(*ptx))
                 return false;
 
@@ -755,7 +722,7 @@ public:
 class CWalletKey
 {
 public:
-    CPrivKey vchPrivKey;
+    CSecret vchPrivKey;
     int64 nTimeCreated;
     int64 nTimeExpires;
     std::string strComment;
@@ -890,86 +857,6 @@ private:
     std::vector<char> _ssExtra;
 };
 
-class CZerocoinEntry
-{
-public:
-    //public
-    Bignum value;
-    int denomination;
-    //private
-    Bignum randomness;
-    Bignum serialNumber;
-
-    bool IsUsed;
-    int nHeight;
-    int id;
-
-    CZerocoinEntry()
-    {
-        SetNull();
-    }
-
-    void SetNull()
-    {
-        IsUsed = false;
-        randomness = 0;
-        serialNumber = 0;
-        value = 0;
-        denomination = -1;
-        nHeight = -1;
-        id = -1;
-    }
-
-
-    IMPLEMENT_SERIALIZE
-    (
-        READWRITE(IsUsed);
-        READWRITE(randomness);
-        READWRITE(serialNumber);
-        READWRITE(value);
-        READWRITE(denomination);
-        READWRITE(nHeight);
-        READWRITE(id);
-    )
-};
-
-
-class CZerocoinSpendEntry
-{
-public:
-    Bignum coinSerial;
-    uint256 hashTx;
-    Bignum pubCoin;
-    int denomination;
-    int id;
-
-    CZerocoinSpendEntry()
-    {
-        SetNull();
-    }
-
-    void SetNull()
-    {
-        coinSerial = 0;
-        hashTx = 0;
-        pubCoin = 0;
-        denomination = 0;
-        id = 0;
-    }
-
-
-    IMPLEMENT_SERIALIZE
-    (
-        READWRITE(coinSerial);
-        READWRITE(hashTx);
-        READWRITE(pubCoin);
-        READWRITE(denomination);
-        READWRITE(id);
-    )
-};
-
-
 bool GetWalletFile(CWallet* pwallet, std::string &strWalletFileOut);
-bool CompHeight(const CZerocoinEntry & a, const CZerocoinEntry & b);
 
 #endif

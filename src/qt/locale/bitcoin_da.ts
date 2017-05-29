@@ -4,13 +4,13 @@
     <name>AboutDialog</name>
     <message>
         <location filename="../forms/aboutdialog.ui" line="+14"/>
-        <source>About smartcash</source>
-        <translation>Om smartcash</translation>
+        <source>About Bctcoin</source>
+        <translation>Om Bctcoin</translation>
     </message>
     <message>
         <location line="+39"/>
-        <source>&lt;b&gt;smartcash&lt;/b&gt; version</source>
-        <translation>&lt;b&gt;smartcash&lt;/b&gt; version</translation>
+        <source>&lt;b&gt;Bctcoin&lt;/b&gt; version</source>
+        <translation>&lt;b&gt;Bctcoin&lt;/b&gt; version</translation>
     </message>
     <message>
         <location line="+57"/>
@@ -34,8 +34,8 @@ Produktet indeholder software som er udviklet af OpenSSL Project til brug i Open
     </message>
     <message>
         <location line="+0"/>
-        <source>The smartcash developers</source>
-        <translation>smartcash-udviklerne</translation>
+        <source>The Bctcoin developers</source>
+        <translation>Bctcoin-udviklerne</translation>
     </message>
 </context>
 <context>
@@ -67,8 +67,8 @@ Produktet indeholder software som er udviklet af OpenSSL Project til brug i Open
     </message>
     <message>
         <location filename="../addressbookpage.cpp" line="+63"/>
-        <source>These are your smartcash addresses for receiving payments. You may want to give a different one to each sender so you can keep track of who is paying you.</source>
-        <translation>Dette er dine smartcash-adresser til at modtage betalinger med. Du kan give en forskellig adresse til hver afsender, så du kan holde styr på, hvem der betaler dig.</translation>
+        <source>These are your Bctcoin addresses for receiving payments. You may want to give a different one to each sender so you can keep track of who is paying you.</source>
+        <translation>Dette er dine Bctcoin-adresser til at modtage betalinger med. Du kan give en forskellig adresse til hver afsender, så du kan holde styr på, hvem der betaler dig.</translation>
     </message>
     <message>
         <location filename="../forms/addressbookpage.ui" line="+14"/>
@@ -82,8 +82,8 @@ Produktet indeholder software som er udviklet af OpenSSL Project til brug i Open
     </message>
     <message>
         <location line="+11"/>
-        <source>Sign a message to prove you own a smartcash address</source>
-        <translation>Underskriv en besked for at bevise, at en smartcash-adresse tilhører dig</translation>
+        <source>Sign a message to prove you own a Bctcoin address</source>
+        <translation>Underskriv en besked for at bevise, at en Bctcoin-adresse tilhører dig</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -107,8 +107,8 @@ Produktet indeholder software som er udviklet af OpenSSL Project til brug i Open
     </message>
     <message>
         <location line="-44"/>
-        <source>Verify a message to ensure it was signed with a specified smartcash address</source>
-        <translation>Efterprøv en besked for at sikre, at den er underskrevet med den angivne smartcash-adresse</translation>
+        <source>Verify a message to ensure it was signed with a specified Bctcoin address</source>
+        <translation>Efterprøv en besked for at sikre, at den er underskrevet med den angivne Bctcoin-adresse</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -122,8 +122,8 @@ Produktet indeholder software som er udviklet af OpenSSL Project til brug i Open
     </message>
     <message>
         <location filename="../addressbookpage.cpp" line="-5"/>
-        <source>These are your smartcash addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
-        <translation>Disse er dine smartcash-adresser for at sende betalinger. Tjek altid beløb og modtageradresse, inden du sender smartcashs.</translation>
+        <source>These are your Bctcoin addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
+        <translation>Disse er dine Bctcoin-adresser for at sende betalinger. Tjek altid beløb og modtageradresse, inden du sender bitcoins.</translation>
     </message>
     <message>
         <location line="+13"/>
@@ -138,7 +138,7 @@ Produktet indeholder software som er udviklet af OpenSSL Project til brug i Open
     <message>
         <location line="+1"/>
         <source>Send &amp;Coins</source>
-        <translation>Send smartcashs</translation>
+        <translation>Send bitcoins</translation>
     </message>
     <message>
         <location line="+260"/>
@@ -248,8 +248,8 @@ Produktet indeholder software som er udviklet af OpenSSL Project til brug i Open
     </message>
     <message>
         <location line="+1"/>
-        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR smartcashS&lt;/b&gt;!</source>
-        <translation>Advarsel: Hvis du krypterer din tegnebog og mister din adgangskode, vil du &lt;b&gt;MISTE ALLE DINE smartcashS&lt;/b&gt;!</translation>
+        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR BITCOINS&lt;/b&gt;!</source>
+        <translation>Advarsel: Hvis du krypterer din tegnebog og mister din adgangskode, vil du &lt;b&gt;MISTE ALLE DINE BITCOINS&lt;/b&gt;!</translation>
     </message>
     <message>
         <location line="+0"/>
@@ -275,8 +275,8 @@ Produktet indeholder software som er udviklet af OpenSSL Project til brug i Open
     </message>
     <message>
         <location line="-56"/>
-        <source>smartcash will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your smartcashs from being stolen by malware infecting your computer.</source>
-        <translation>smartcash vil nu lukke for at gennemføre krypteringsprocessen. Husk på, at kryptering af din tegnebog vil ikke beskytte dine smartcashs fuldt ud mod at blive stjålet af malware på din computer.</translation>
+        <source>Bctcoin will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your bitcoins from being stolen by malware infecting your computer.</source>
+        <translation>Bctcoin vil nu lukke for at gennemføre krypteringsprocessen. Husk på, at kryptering af din tegnebog vil ikke beskytte dine bitcoins fuldt ud mod at blive stjålet af malware på din computer.</translation>
     </message>
     <message>
         <location line="+13"/>
@@ -374,8 +374,8 @@ Produktet indeholder software som er udviklet af OpenSSL Project til brug i Open
     </message>
     <message>
         <location line="+4"/>
-        <source>Show information about smartcash</source>
-        <translation>Vis informationer om smartcash</translation>
+        <source>Show information about Bctcoin</source>
+        <translation>Vis informationer om Bctcoin</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -419,13 +419,13 @@ Produktet indeholder software som er udviklet af OpenSSL Project til brug i Open
     </message>
     <message>
         <location line="-347"/>
-        <source>Send coins to a smartcash address</source>
-        <translation>Send smartcashs til en smartcash-adresse</translation>
+        <source>Send coins to a Bctcoin address</source>
+        <translation>Send bitcoins til en Bctcoin-adresse</translation>
     </message>
     <message>
         <location line="+49"/>
-        <source>Modify configuration options for smartcash</source>
-        <translation>Rediger konfigurationsindstillinger af smartcash</translation>
+        <source>Modify configuration options for Bctcoin</source>
+        <translation>Rediger konfigurationsindstillinger af Bctcoin</translation>
     </message>
     <message>
         <location line="+9"/>
@@ -455,8 +455,8 @@ Produktet indeholder software som er udviklet af OpenSSL Project til brug i Open
     <message>
         <location line="-165"/>
         <location line="+530"/>
-        <source>smartcash</source>
-        <translation>smartcash</translation>
+        <source>Bctcoin</source>
+        <translation>Bctcoin</translation>
     </message>
     <message>
         <location line="-530"/>
@@ -480,8 +480,8 @@ Produktet indeholder software som er udviklet af OpenSSL Project til brug i Open
     </message>
     <message>
         <location line="+22"/>
-        <source>&amp;About smartcash</source>
-        <translation>Om smartcash</translation>
+        <source>&amp;About Bctcoin</source>
+        <translation>Om Bctcoin</translation>
     </message>
     <message>
         <location line="+9"/>
@@ -500,13 +500,13 @@ Produktet indeholder software som er udviklet af OpenSSL Project til brug i Open
     </message>
     <message>
         <location line="+7"/>
-        <source>Sign messages with your smartcash addresses to prove you own them</source>
-        <translation>Underskriv beskeder med dine smartcash-adresser for at bevise, at de tilhører dig</translation>
+        <source>Sign messages with your Bctcoin addresses to prove you own them</source>
+        <translation>Underskriv beskeder med dine Bctcoin-adresser for at bevise, at de tilhører dig</translation>
     </message>
     <message>
         <location line="+2"/>
-        <source>Verify messages to ensure they were signed with specified smartcash addresses</source>
-        <translation>Efterprøv beskeder for at sikre, at de er underskrevet med de(n) angivne smartcash-adresse(r)</translation>
+        <source>Verify messages to ensure they were signed with specified Bctcoin addresses</source>
+        <translation>Efterprøv beskeder for at sikre, at de er underskrevet med de(n) angivne Bctcoin-adresse(r)</translation>
     </message>
     <message>
         <location line="+28"/>
@@ -536,13 +536,13 @@ Produktet indeholder software som er udviklet af OpenSSL Project til brug i Open
     </message>
     <message>
         <location line="+47"/>
-        <source>smartcash client</source>
-        <translation>smartcash-klient</translation>
+        <source>Bctcoin client</source>
+        <translation>Bctcoin-klient</translation>
     </message>
     <message numerus="yes">
         <location line="+141"/>
-        <source>%n active connection(s) to smartcash network</source>
-        <translation><numerusform>%n aktiv(e) forbindelse(r) til smartcash-netværket</numerusform><numerusform>%n aktiv(e) forbindelse(r) til smartcash-netværket</numerusform></translation>
+        <source>%n active connection(s) to Bctcoin network</source>
+        <translation><numerusform>%n aktiv(e) forbindelse(r) til Bctcoin-netværket</numerusform><numerusform>%n aktiv(e) forbindelse(r) til Bctcoin-netværket</numerusform></translation>
     </message>
     <message>
         <location line="+22"/>
@@ -656,8 +656,8 @@ Adresse: %4
     <message>
         <location line="-23"/>
         <location line="+23"/>
-        <source>URI can not be parsed! This can be caused by an invalid smartcash address or malformed URI parameters.</source>
-        <translation>URI kan ikke fortolkes! Dette kan skyldes en ugyldig smartcash-adresse eller misdannede URI-parametre.</translation>
+        <source>URI can not be parsed! This can be caused by an invalid Bctcoin address or malformed URI parameters.</source>
+        <translation>URI kan ikke fortolkes! Dette kan skyldes en ugyldig Bctcoin-adresse eller misdannede URI-parametre.</translation>
     </message>
     <message>
         <location line="+17"/>
@@ -671,8 +671,8 @@ Adresse: %4
     </message>
     <message>
         <location filename="../bitcoin.cpp" line="+111"/>
-        <source>A fatal error occurred. smartcash can no longer continue safely and will quit.</source>
-        <translation>Der opstod en fatal fejl. smartcash kan ikke længere fortsætte sikkert og vil afslutte.</translation>
+        <source>A fatal error occurred. Bctcoin can no longer continue safely and will quit.</source>
+        <translation>Der opstod en fatal fejl. Bctcoin kan ikke længere fortsætte sikkert og vil afslutte.</translation>
     </message>
 </context>
 <context>
@@ -737,8 +737,8 @@ Adresse: %4
     </message>
     <message>
         <location line="-5"/>
-        <source>The entered address &quot;%1&quot; is not a valid smartcash address.</source>
-        <translation>Den indtastede adresse &quot;%1&quot; er ikke en gyldig smartcash-adresse.</translation>
+        <source>The entered address &quot;%1&quot; is not a valid Bctcoin address.</source>
+        <translation>Den indtastede adresse &quot;%1&quot; er ikke en gyldig Bctcoin-adresse.</translation>
     </message>
     <message>
         <location line="+10"/>
@@ -756,8 +756,8 @@ Adresse: %4
     <message>
         <location filename="../guiutil.cpp" line="+424"/>
         <location line="+12"/>
-        <source>smartcash</source>
-        <translation>smartcash</translation>
+        <source>Bctcoin-Qt</source>
+        <translation>Bctcoin-Qt</translation>
     </message>
     <message>
         <location line="-12"/>
@@ -819,13 +819,13 @@ Adresse: %4
     </message>
     <message>
         <location line="+31"/>
-        <source>Automatically start smartcash after logging in to the system.</source>
-        <translation>Start smartcash automatisk, når der logges ind på systemet</translation>
+        <source>Automatically start Bctcoin after logging in to the system.</source>
+        <translation>Start Bctcoin automatisk, når der logges ind på systemet</translation>
     </message>
     <message>
         <location line="+3"/>
-        <source>&amp;Start smartcash on system login</source>
-        <translation>Start smartcash, når systemet startes</translation>
+        <source>&amp;Start Bctcoin on system login</source>
+        <translation>Start Bctcoin, når systemet startes</translation>
     </message>
     <message>
         <location line="+35"/>
@@ -844,8 +844,8 @@ Adresse: %4
     </message>
     <message>
         <location line="+6"/>
-        <source>Automatically open the smartcash client port on the router. This only works when your router supports UPnP and it is enabled.</source>
-        <translation>Åbn smartcash-klientens port på routeren automatisk. Dette virker kun, når din router understøtter UPnP og UPnP er aktiveret.</translation>
+        <source>Automatically open the Bctcoin client port on the router. This only works when your router supports UPnP and it is enabled.</source>
+        <translation>Åbn Bctcoin-klientens port på routeren automatisk. Dette virker kun, når din router understøtter UPnP og UPnP er aktiveret.</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -854,8 +854,8 @@ Adresse: %4
     </message>
     <message>
         <location line="+7"/>
-        <source>Connect to the smartcash network through a SOCKS proxy (e.g. when connecting through Tor).</source>
-        <translation>Opret forbindelse til smartcash-netværket via en SOCKS-proxy (f.eks. ved tilslutning gennem Tor)</translation>
+        <source>Connect to the Bctcoin network through a SOCKS proxy (e.g. when connecting through Tor).</source>
+        <translation>Opret forbindelse til Bctcoin-netværket via en SOCKS-proxy (f.eks. ved tilslutning gennem Tor)</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -929,8 +929,8 @@ Adresse: %4
     </message>
     <message>
         <location line="+13"/>
-        <source>The user interface language can be set here. This setting will take effect after restarting smartcash.</source>
-        <translation>Brugergrænsefladesproget kan angives her. Denne indstilling træder først i kraft, når smartcash genstartes.</translation>
+        <source>The user interface language can be set here. This setting will take effect after restarting Bctcoin.</source>
+        <translation>Brugergrænsefladesproget kan angives her. Denne indstilling træder først i kraft, når Bctcoin genstartes.</translation>
     </message>
     <message>
         <location line="+11"/>
@@ -940,12 +940,12 @@ Adresse: %4
     <message>
         <location line="+13"/>
         <source>Choose the default subdivision unit to show in the interface and when sending coins.</source>
-        <translation>Vælg den standard underopdelingsenhed, som skal vises i brugergrænsefladen og ved afsendelse af smartcashs.</translation>
+        <translation>Vælg den standard underopdelingsenhed, som skal vises i brugergrænsefladen og ved afsendelse af bitcoins.</translation>
     </message>
     <message>
         <location line="+9"/>
-        <source>Whether to show smartcash addresses in the transaction list or not.</source>
-        <translation>Afgør hvorvidt smartcash-adresser skal vises i transaktionslisten eller ej.</translation>
+        <source>Whether to show Bctcoin addresses in the transaction list or not.</source>
+        <translation>Afgør hvorvidt Bctcoin-adresser skal vises i transaktionslisten eller ej.</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -996,8 +996,8 @@ Adresse: %4
     <message>
         <location line="-9"/>
         <location line="+9"/>
-        <source>This setting will take effect after restarting smartcash.</source>
-        <translation>Denne indstilling træder i kraft, efter smartcash genstartes.</translation>
+        <source>This setting will take effect after restarting Bctcoin.</source>
+        <translation>Denne indstilling træder i kraft, efter Bctcoin genstartes.</translation>
     </message>
     <message>
         <location line="+29"/>
@@ -1015,8 +1015,8 @@ Adresse: %4
     <message>
         <location line="+50"/>
         <location line="+166"/>
-        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the smartcash network after a connection is established, but this process has not completed yet.</source>
-        <translation>Den viste information kan være forældet. Din tegnebog synkroniserer automatisk med smartcash-netværket, når en forbindelse etableres, men denne proces er ikke gennemført endnu.</translation>
+        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Bctcoin network after a connection is established, but this process has not completed yet.</source>
+        <translation>Den viste information kan være forældet. Din tegnebog synkroniserer automatisk med Bctcoin-netværket, når en forbindelse etableres, men denne proces er ikke gennemført endnu.</translation>
     </message>
     <message>
         <location line="-124"/>
@@ -1069,8 +1069,8 @@ Adresse: %4
     <name>PaymentServer</name>
     <message>
         <location filename="../paymentserver.cpp" line="+107"/>
-        <source>Cannot start smartcash: click-to-pay handler</source>
-        <translation>Kan ikke starte smartcash: click-to-pay-håndtering</translation>
+        <source>Cannot start bitcoin: click-to-pay handler</source>
+        <translation>Kan ikke starte bitcoin: click-to-pay-håndtering</translation>
     </message>
 </context>
 <context>
@@ -1219,8 +1219,8 @@ Adresse: %4
     </message>
     <message>
         <location line="+7"/>
-        <source>Show the smartcash help message to get a list with possible smartcash command-line options.</source>
-        <translation>Vis smartcash-hjælpebeskeden for at få en liste over de tilgængelige smartcash-kommandolinjeindstillinger.</translation>
+        <source>Show the Bctcoin-Qt help message to get a list with possible Bctcoin command-line options.</source>
+        <translation>Vis Bctcoin-Qt-hjælpebeskeden for at få en liste over de tilgængelige Bctcoin-kommandolinjeindstillinger.</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -1239,13 +1239,13 @@ Adresse: %4
     </message>
     <message>
         <location line="-104"/>
-        <source>smartcash - Debug window</source>
-        <translation>smartcash - Fejlsøgningsvindue</translation>
+        <source>Bctcoin - Debug window</source>
+        <translation>Bctcoin - Fejlsøgningsvindue</translation>
     </message>
     <message>
         <location line="+25"/>
-        <source>smartcash Core</source>
-        <translation>smartcash Core</translation>
+        <source>Bctcoin Core</source>
+        <translation>Bctcoin Core</translation>
     </message>
     <message>
         <location line="+279"/>
@@ -1254,8 +1254,8 @@ Adresse: %4
     </message>
     <message>
         <location line="+7"/>
-        <source>Open the smartcash debug log file from the current data directory. This can take a few seconds for large log files.</source>
-        <translation>Åbn smartcash-fejlsøgningslogfilen fra det nuværende datakatalog. Dette kan tage nogle få sekunder for en store logfiler.</translation>
+        <source>Open the Bctcoin debug log file from the current data directory. This can take a few seconds for large log files.</source>
+        <translation>Åbn Bctcoin-fejlsøgningslogfilen fra det nuværende datakatalog. Dette kan tage nogle få sekunder for en store logfiler.</translation>
     </message>
     <message>
         <location line="+102"/>
@@ -1264,8 +1264,8 @@ Adresse: %4
     </message>
     <message>
         <location filename="../rpcconsole.cpp" line="-30"/>
-        <source>Welcome to the smartcash RPC console.</source>
-        <translation>Velkommen til smartcash RPC-konsollen</translation>
+        <source>Welcome to the Bctcoin RPC console.</source>
+        <translation>Velkommen til Bctcoin RPC-konsollen</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -1290,7 +1290,7 @@ Adresse: %4
         <location line="+5"/>
         <location line="+5"/>
         <source>Send Coins</source>
-        <translation>Send smartcashs</translation>
+        <translation>Send bitcoins</translation>
     </message>
     <message>
         <location line="+50"/>
@@ -1340,7 +1340,7 @@ Adresse: %4
     <message>
         <location line="+5"/>
         <source>Confirm send coins</source>
-        <translation>Bekræft afsendelse af smartcashs</translation>
+        <translation>Bekræft afsendelse af bitcoins</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -1385,7 +1385,7 @@ Adresse: %4
     <message>
         <location line="+5"/>
         <source>Error: The transaction was rejected. This might happen if some of the coins in your wallet were already spent, such as if you used a copy of wallet.dat and coins were spent in the copy but not marked as spent here.</source>
-        <translation>Fejl: Transaktionen blev afvist. Dette kan ske, hvis nogle af dine smartcashs i din tegnebog allerede er brugt, som hvis du brugte en kopi af wallet.dat og dine smartcashs er blevet brugt i kopien, men ikke er markeret som brugt her.</translation>
+        <translation>Fejl: Transaktionen blev afvist. Dette kan ske, hvis nogle af dine bitcoins i din tegnebog allerede er brugt, som hvis du brugte en kopi af wallet.dat og dine bitcoins er blevet brugt i kopien, men ikke er markeret som brugt her.</translation>
     </message>
 </context>
 <context>
@@ -1407,8 +1407,8 @@ Adresse: %4
     </message>
     <message>
         <location line="+34"/>
-        <source>The address to send the payment to (e.g. MUVz3KZqgJdC3djwVCLD6ZMpDj5X1FqeKs)</source>
-        <translation>smartcash-adressen som betalingen skal sendes til (f.eks. MUVz3KZqgJdC3djwVCLD6ZMpDj5X1FqeKs)</translation>
+        <source>The address to send the payment to (e.g. mXAdbKFo1vu3Svqt4fWMyZM6jQTMuBR4RG)</source>
+        <translation>Bctcoin-adressen som betalingen skal sendes til (f.eks. mXAdbKFo1vu3Svqt4fWMyZM6jQTMuBR4RG)</translation>
     </message>
     <message>
         <location line="+60"/>
@@ -1448,8 +1448,8 @@ Adresse: %4
     </message>
     <message>
         <location filename="../sendcoinsentry.cpp" line="+1"/>
-        <source>Enter a smartcash address (e.g. MUVz3KZqgJdC3djwVCLD6ZMpDj5X1FqeKs)</source>
-        <translation>Indtast en smartcash-adresse (f.eks. MUVz3KZqgJdC3djwVCLD6ZMpDj5X1FqeKs)</translation>
+        <source>Enter a Bctcoin address (e.g. mXAdbKFo1vu3Svqt4fWMyZM6jQTMuBR4RG)</source>
+        <translation>Indtast en Bctcoin-adresse (f.eks. mXAdbKFo1vu3Svqt4fWMyZM6jQTMuBR4RG)</translation>
     </message>
 </context>
 <context>
@@ -1467,12 +1467,12 @@ Adresse: %4
     <message>
         <location line="+6"/>
         <source>You can sign messages with your addresses to prove you own them. Be careful not to sign anything vague, as phishing attacks may try to trick you into signing your identity over to them. Only sign fully-detailed statements you agree to.</source>
-        <translation>Du kan underskrive beskeder med dine smartcash-adresser for at bevise, at de tilhører dig. Pas på ikke at underskrive noget vagt, da phisingangreb kan narre dig til at overdrage din identitet. Underskriv kun fuldt detaljerede udsagn, du er enig i.</translation>
+        <translation>Du kan underskrive beskeder med dine Bctcoin-adresser for at bevise, at de tilhører dig. Pas på ikke at underskrive noget vagt, da phisingangreb kan narre dig til at overdrage din identitet. Underskriv kun fuldt detaljerede udsagn, du er enig i.</translation>
     </message>
     <message>
         <location line="+18"/>
-        <source>The address to sign the message with (e.g. MUVz3KZqgJdC3djwVCLD6ZMpDj5X1FqeKs)</source>
-        <translation>smartcash-adressen som beskeden skal underskrives med (f.eks. MUVz3KZqgJdC3djwVCLD6ZMpDj5X1FqeKs)</translation>
+        <source>The address to sign the message with (e.g. mXAdbKFo1vu3Svqt4fWMyZM6jQTMuBR4RG)</source>
+        <translation>Bctcoin-adressen som beskeden skal underskrives med (f.eks. mXAdbKFo1vu3Svqt4fWMyZM6jQTMuBR4RG)</translation>
     </message>
     <message>
         <location line="+10"/>
@@ -1513,8 +1513,8 @@ Adresse: %4
     </message>
     <message>
         <location line="+21"/>
-        <source>Sign the message to prove you own this smartcash address</source>
-        <translation>Underskriv denne besked for at bevise, at smartcash-adressen tilhører dig</translation>
+        <source>Sign the message to prove you own this Bctcoin address</source>
+        <translation>Underskriv denne besked for at bevise, at Bctcoin-adressen tilhører dig</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -1544,13 +1544,13 @@ Adresse: %4
     </message>
     <message>
         <location line="+21"/>
-        <source>The address the message was signed with (e.g. MUVz3KZqgJdC3djwVCLD6ZMpDj5X1FqeKs)</source>
-        <translation>smartcash-adressen som beskeden er underskrevet med (f.eks. MUVz3KZqgJdC3djwVCLD6ZMpDj5X1FqeKs)</translation>
+        <source>The address the message was signed with (e.g. mXAdbKFo1vu3Svqt4fWMyZM6jQTMuBR4RG)</source>
+        <translation>Bctcoin-adressen som beskeden er underskrevet med (f.eks. mXAdbKFo1vu3Svqt4fWMyZM6jQTMuBR4RG)</translation>
     </message>
     <message>
         <location line="+40"/>
-        <source>Verify the message to ensure it was signed with the specified smartcash address</source>
-        <translation>Efterprøv beskeden for at sikre, at den er underskrevet med den angivne smartcash-adresse</translation>
+        <source>Verify the message to ensure it was signed with the specified Bctcoin address</source>
+        <translation>Efterprøv beskeden for at sikre, at den er underskrevet med den angivne Bctcoin-adresse</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -1565,8 +1565,8 @@ Adresse: %4
     <message>
         <location filename="../signverifymessagedialog.cpp" line="+27"/>
         <location line="+3"/>
-        <source>Enter a smartcash address (e.g. MUVz3KZqgJdC3djwVCLD6ZMpDj5X1FqeKs)</source>
-        <translation>Indtast en smartcash-adresse (f.eks. MUVz3KZqgJdC3djwVCLD6ZMpDj5X1FqeKs)</translation>
+        <source>Enter a Bctcoin address (e.g. mXAdbKFo1vu3Svqt4fWMyZM6jQTMuBR4RG)</source>
+        <translation>Indtast en Bctcoin-adresse (f.eks. mXAdbKFo1vu3Svqt4fWMyZM6jQTMuBR4RG)</translation>
     </message>
     <message>
         <location line="-2"/>
@@ -1575,8 +1575,8 @@ Adresse: %4
     </message>
     <message>
         <location line="+3"/>
-        <source>Enter smartcash signature</source>
-        <translation>Indtast smartcash-underskriften</translation>
+        <source>Enter Bctcoin signature</source>
+        <translation>Indtast Bctcoin-underskriften</translation>
     </message>
     <message>
         <location line="+82"/>
@@ -1649,8 +1649,8 @@ Adresse: %4
     <name>SplashScreen</name>
     <message>
         <location filename="../splashscreen.cpp" line="+22"/>
-        <source>The smartcash developers</source>
-        <translation>smartcash-udviklerne</translation>
+        <source>The Bctcoin developers</source>
+        <translation>Bctcoin-udviklerne</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -1784,7 +1784,7 @@ Adresse: %4
     <message>
         <location line="+3"/>
         <source>Generated coins must mature 120 blocks before they can be spent. When you generated this block, it was broadcast to the network to be added to the block chain. If it fails to get into the chain, its state will change to &quot;not accepted&quot; and it won&apos;t be spendable. This may occasionally happen if another node generates a block within a few seconds of yours.</source>
-        <translation>Genererede smartcashs skal vente 120 blokke, før de kan blive brugt. Da du genererede denne blok, blev den transmitteret til netværket for at blive føjet til blokkæden. Hvis det mislykkes at komme ind i kæden, vil den skifte til &quot;ikke godkendt&quot; og ikke blive kunne bruges. Dette kan lejlighedsvis ske, hvis en anden knude genererer en blok inden for få sekunder af din.</translation>
+        <translation>Genererede bitcoins skal vente 120 blokke, før de kan blive brugt. Da du genererede denne blok, blev den transmitteret til netværket for at blive føjet til blokkæden. Hvis det mislykkes at komme ind i kæden, vil den skifte til &quot;ikke godkendt&quot; og ikke blive kunne bruges. Dette kan lejlighedsvis ske, hvis en anden knude genererer en blok inden for få sekunder af din.</translation>
     </message>
     <message>
         <location line="+7"/>
@@ -2137,7 +2137,7 @@ Adresse: %4
     <message>
         <location filename="../walletmodel.cpp" line="+193"/>
         <source>Send Coins</source>
-        <translation>Send smartcashs</translation>
+        <translation>Send bitcoins</translation>
     </message>
 </context>
 <context>
@@ -2187,8 +2187,8 @@ Adresse: %4
     <name>bitcoin-core</name>
     <message>
         <location filename="../bitcoinstrings.cpp" line="+94"/>
-        <source>smartcash version</source>
-        <translation>smartcash-version</translation>
+        <source>Bctcoin version</source>
+        <translation>Bctcoin-version</translation>
     </message>
     <message>
         <location line="+102"/>
@@ -2197,8 +2197,8 @@ Adresse: %4
     </message>
     <message>
         <location line="-29"/>
-        <source>Send command to -server or smartcashd</source>
-        <translation>Send kommando til -server eller smartcashd</translation>
+        <source>Send command to -server or bitcoind</source>
+        <translation>Send kommando til -server eller bitcoind</translation>
     </message>
     <message>
         <location line="-23"/>
@@ -2217,13 +2217,13 @@ Adresse: %4
     </message>
     <message>
         <location line="+24"/>
-        <source>Specify configuration file (default: smartcash.conf)</source>
-        <translation>Angiv konfigurationsfil (standard: smartcash.conf)</translation>
+        <source>Specify configuration file (default: bitcoin.conf)</source>
+        <translation>Angiv konfigurationsfil (standard: bitcoin.conf)</translation>
     </message>
     <message>
         <location line="+3"/>
-        <source>Specify pid file (default: smartcashd.pid)</source>
-        <translation>Angiv pid-fil (default: smartcashd.pid)</translation>
+        <source>Specify pid file (default: bitcoind.pid)</source>
+        <translation>Angiv pid-fil (default: bitcoind.pid)</translation>
     </message>
     <message>
         <location line="-1"/>
@@ -2237,8 +2237,8 @@ Adresse: %4
     </message>
     <message>
         <location line="-28"/>
-        <source>Listen for connections on &lt;port&gt; (default: 9333 or testnet: 19333)</source>
-        <translation>Lyt til forbindelser på &lt;port&gt; (standard: 9333 eller testnetværk: 19333)</translation>
+        <source>Listen for connections on &lt;port&gt; (default: 8669 or testnet: 18669)</source>
+        <translation>Lyt til forbindelser på &lt;port&gt; (standard: 8669 eller testnetværk: 18669)</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -2272,8 +2272,8 @@ Adresse: %4
     </message>
     <message>
         <location line="+27"/>
-        <source>Listen for JSON-RPC connections on &lt;port&gt; (default: 9332 or testnet: 19332)</source>
-        <translation>Lyt til JSON-RPC-forbindelser på &lt;port&gt; (standard: 9332 eller testnetværk: 19332)</translation>
+        <source>Listen for JSON-RPC connections on &lt;port&gt; (default: 8669 or testnet: 18669)</source>
+        <translation>Lyt til JSON-RPC-forbindelser på &lt;port&gt; (standard: 8669 eller testnetværk: 18669)</translation>
     </message>
     <message>
         <location line="+37"/>
@@ -2300,24 +2300,24 @@ Adresse: %4
         <source>%s, you must set a rpcpassword in the configuration file:
 %s
 It is recommended you use the following random password:
-rpcuser=smartcashrpc
+rpcuser=bitcoinrpc
 rpcpassword=%s
 (you do not need to remember this password)
 The username and password MUST NOT be the same.
 If the file does not exist, create it with owner-readable-only file permissions.
 It is also recommended to set alertnotify so you are notified of problems;
-for example: alertnotify=echo %%s | mail -s &quot;smartcash Alert&quot; admin@foo.com
+for example: alertnotify=echo %%s | mail -s &quot;Bctcoin Alert&quot; admin@foo.com
 </source>
         <translation>%s, du skal angive en RPC-adgangskode i konfigurationsfilen:
 %s
 Det anbefales, at du bruger nedenstående, tilfældige adgangskode:
-rpcuser=smartcashrpc
+rpcuser=bitcoinrpc
 rpcpassword=%s
 (du behøver ikke huske denne adgangskode)
 Brugernavnet og adgangskode MÅ IKKE være det samme.
 Hvis filen ikke eksisterer, opret den og giv ingen andre end ejeren læserettighed.
 Det anbefales også at angive alertnotify, så du påmindes om problemer;
-f.eks.: alertnotify=echo %%s | mail -s &quot;smartcash Alert&quot; admin@foo.com
+f.eks.: alertnotify=echo %%s | mail -s &quot;Bctcoin Alert&quot; admin@foo.com
 </translation>
     </message>
     <message>
@@ -2332,18 +2332,18 @@ f.eks.: alertnotify=echo %%s | mail -s &quot;smartcash Alert&quot; admin@foo.com
     </message>
     <message>
         <location line="+3"/>
-        <source>Cannot obtain a lock on data directory %s. smartcash is probably already running.</source>
-        <translation>Kan ikke opnå lås på datakatalog %s. smartcash er sandsynligvis allerede startet.</translation>
+        <source>Cannot obtain a lock on data directory %s. Bctcoin is probably already running.</source>
+        <translation>Kan ikke opnå lås på datakatalog %s. Bctcoin er sandsynligvis allerede startet.</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Error: The transaction was rejected! This might happen if some of the coins in your wallet were already spent, such as if you used a copy of wallet.dat and coins were spent in the copy but not marked as spent here.</source>
-        <translation>Fejl: Transaktionen blev afvist. Dette kan ske, hvis nogle af dine smartcashs i din tegnebog allerede er brugt, som hvis du brugte en kopi af wallet.dat og dine smartcashs er blevet brugt i kopien, men ikke er markeret som brugt her.</translation>
+        <translation>Fejl: Transaktionen blev afvist. Dette kan ske, hvis nogle af dine bitcoins i din tegnebog allerede er brugt, som hvis du brugte en kopi af wallet.dat og dine bitcoins er blevet brugt i kopien, men ikke er markeret som brugt her.</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Error: This transaction requires a transaction fee of at least %s because of its amount, complexity, or use of recently received funds!</source>
-        <translation>Fejl: Denne transaktion kræver et transaktionsgebyr på minimum %s pga. dens størrelse, kompleksitet eller anvendelse af nyligt modtagne smartcashs!</translation>
+        <translation>Fejl: Denne transaktion kræver et transaktionsgebyr på minimum %s pga. dens størrelse, kompleksitet eller anvendelse af nyligt modtagne bitcoins!</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -2377,8 +2377,8 @@ f.eks.: alertnotify=echo %%s | mail -s &quot;smartcash Alert&quot; admin@foo.com
     </message>
     <message>
         <location line="+3"/>
-        <source>Warning: Please check that your computer&apos;s date and time are correct! If your clock is wrong smartcash will not work properly.</source>
-        <translation>Advarsel: Undersøg venligst, at din computers dato og klokkeslæt er korrekt indstillet! Hvis der er fejl i disse, vil smartcash ikke fungere korrekt.</translation>
+        <source>Warning: Please check that your computer&apos;s date and time are correct! If your clock is wrong Bctcoin will not work properly.</source>
+        <translation>Advarsel: Undersøg venligst, at din computers dato og klokkeslæt er korrekt indstillet! Hvis der er fejl i disse, vil Bctcoin ikke fungere korrekt.</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -2498,7 +2498,7 @@ f.eks.: alertnotify=echo %%s | mail -s &quot;smartcash Alert&quot; admin@foo.com
     <message>
         <location line="+1"/>
         <source>Failed to write to coin database</source>
-        <translation>Skrivning af smartcash-database mislykkedes</translation>
+        <translation>Skrivning af bitcoin-database mislykkedes</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -2518,7 +2518,7 @@ f.eks.: alertnotify=echo %%s | mail -s &quot;smartcash Alert&quot; admin@foo.com
     <message>
         <location line="+1"/>
         <source>Generate coins (default: 0)</source>
-        <translation>Generer smartcashs (standard: 0)</translation>
+        <translation>Generer bitcoins (standard: 0)</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -2627,8 +2627,8 @@ f.eks.: alertnotify=echo %%s | mail -s &quot;smartcash Alert&quot; admin@foo.com
     </message>
     <message>
         <location line="+5"/>
-        <source>SSL options: (see the smartcash Wiki for SSL setup instructions)</source>
-        <translation>SSL-indstillinger: (se smartcash Wiki for SSL-opsætningsinstruktioner)</translation>
+        <source>SSL options: (see the Bctcoin Wiki for SSL setup instructions)</source>
+        <translation>SSL-indstillinger: (se Bctcoin Wiki for SSL-opsætningsinstruktioner)</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -2817,13 +2817,13 @@ f.eks.: alertnotify=echo %%s | mail -s &quot;smartcash Alert&quot; admin@foo.com
     </message>
     <message>
         <location line="+1"/>
-        <source>Error loading wallet.dat: Wallet requires newer version of smartcash</source>
-        <translation>Fejl ved indlæsning af wallet.dat: Tegnebog kræver en nyere version af smartcash</translation>
+        <source>Error loading wallet.dat: Wallet requires newer version of Bctcoin</source>
+        <translation>Fejl ved indlæsning af wallet.dat: Tegnebog kræver en nyere version af Bctcoin</translation>
     </message>
     <message>
         <location line="+93"/>
-        <source>Wallet needed to be rewritten: restart smartcash to complete</source>
-        <translation>Det var nødvendigt at genskrive tegnebogen: genstart smartcash for at gennemføre</translation>
+        <source>Wallet needed to be rewritten: restart Bctcoin to complete</source>
+        <translation>Det var nødvendigt at genskrive tegnebogen: genstart Bctcoin for at gennemføre</translation>
     </message>
     <message>
         <location line="-95"/>
@@ -2882,8 +2882,8 @@ f.eks.: alertnotify=echo %%s | mail -s &quot;smartcash Alert&quot; admin@foo.com
     </message>
     <message>
         <location line="-25"/>
-        <source>Unable to bind to %s on this computer. smartcash is probably already running.</source>
-        <translation>Kunne ikke tildele %s på denne computer. smartcash kører sikkert allerede.</translation>
+        <source>Unable to bind to %s on this computer. Bctcoin is probably already running.</source>
+        <translation>Kunne ikke tildele %s på denne computer. Bctcoin kører sikkert allerede.</translation>
     </message>
     <message>
         <location line="+64"/>

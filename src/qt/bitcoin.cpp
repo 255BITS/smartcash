@@ -1,6 +1,6 @@
-// Copyright (c) 2011-2013 The Bitcoin developers
-// Distributed under the MIT/X11 software license, see the accompanying
-// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+/*
+ * W.J. van der Laan 2011-2012
+ */
 
 #include <QApplication>
 
@@ -17,13 +17,14 @@
 #include "splashscreen.h"
 
 #include <QMessageBox>
-#if QT_VERSION < 0x050000
-#include <QTextCodec>
-#endif
 #include <QLocale>
 #include <QTimer>
 #include <QTranslator>
 #include <QLibraryInfo>
+
+#if QT_VERSION < 0x050000
+#include <QTextCodec>
+#endif
 
 #ifdef Q_OS_MAC
 #include "macdockiconhandler.h"
@@ -102,7 +103,7 @@ static void InitMessage(const std::string &message)
  */
 static std::string Translate(const char* psz)
 {
-    return QCoreApplication::translate("bitcoin-core", psz).toStdString();
+    return QCoreApplication::translate("BctCoin-core", psz).toStdString();
 }
 
 /* Handle runaway exceptions. Shows a message box with the problem and quits the program.
@@ -110,7 +111,7 @@ static std::string Translate(const char* psz)
 static void handleRunawayException(std::exception *e)
 {
     PrintExceptionContinue(e, "Runaway exception");
-    QMessageBox::critical(0, "Runaway exception", BitcoinGUI::tr("A fatal error occurred. smartcash can no longer continue safely and will quit.") + QString("\n\n") + QString::fromStdString(strMiscWarning));
+    QMessageBox::critical(0, "Runaway exception", BitcoinGUI::tr("A fatal error occurred. BctCoin can no longer continue safely and will quit.") + QString("\n\n") + QString::fromStdString(strMiscWarning));
     exit(1);
 }
 
@@ -119,7 +120,7 @@ int main(int argc, char *argv[])
 {
     // Command-line options take precedence:
     ParseParameters(argc, argv);
-
+	
 #if QT_VERSION < 0x050000
     // Internal string conversion is all UTF-8
     QTextCodec::setCodecForTr(QTextCodec::codecForName("UTF-8"));
@@ -141,12 +142,12 @@ int main(int argc, char *argv[])
     // Install global event filter that makes sure that long tooltips can be word-wrapped
     app.installEventFilter(new GUIUtil::ToolTipToRichTextFilter(TOOLTIP_WRAP_THRESHOLD, &app));
 
-    // ... then bitcoin.conf:
+    // ... then BctCoin.conf:
     if (!boost::filesystem::is_directory(GetDataDir(false)))
     {
         // This message can not be translated, as translation is not initialized yet
-        // (which not yet possible because lang=XX can be overridden in bitcoin.conf in the data directory)
-        QMessageBox::critical(0, "smartcash",
+        // (which not yet possible because lang=XX can be overridden in BctCoin.conf in the data directory)
+        QMessageBox::critical(0, "BctCoin",
                               QString("Error: Specified data directory \"%1\" does not exist.").arg(QString::fromStdString(mapArgs["-datadir"])));
         return 1;
     }
@@ -154,12 +155,12 @@ int main(int argc, char *argv[])
 
     // Application identification (must be set before OptionsModel is initialized,
     // as it is used to locate QSettings)
-    QApplication::setOrganizationName("smartcash");
-    QApplication::setOrganizationDomain("smartcash.io");
+    QApplication::setOrganizationName("BctCoin");
+    QApplication::setOrganizationDomain("BctCoin.org");
     if(GetBoolArg("-testnet")) // Separate UI settings for testnet
-        QApplication::setApplicationName("Smartcash-Testnet");
+        QApplication::setApplicationName("BctCoin-Qt-testnet");
     else
-        QApplication::setApplicationName("Smartcash");
+        QApplication::setApplicationName("BctCoin-Qt");
 
     // ... then GUI settings:
     OptionsModel optionsModel;
@@ -226,12 +227,9 @@ int main(int argc, char *argv[])
 
     try
     {
-#ifndef Q_OS_MAC
         // Regenerate startup link, to fix links to old versions
-        // OSX: makes no sense on mac and might also scan/mount external (and sleeping) volumes (can take up some secs)
         if (GUIUtil::GetStartOnSystemStartup())
             GUIUtil::SetStartOnSystemStartup(true);
-#endif
 
         boost::thread_group threadGroup;
 
@@ -254,16 +252,11 @@ int main(int argc, char *argv[])
                     splash.finish(&window);
 
                 ClientModel clientModel(&optionsModel);
-                WalletModel *walletModel = 0;
-                if(pwalletMain)
-                    walletModel = new WalletModel(pwalletMain, &optionsModel);
+                WalletModel walletModel(pwalletMain, &optionsModel);
 
                 window.setClientModel(&clientModel);
-                if(walletModel)
-                {
-                    window.addWallet("~Default", walletModel);
-                    window.setCurrentWallet("~Default");
-                }
+                window.addWallet("~Default", &walletModel);
+                window.setCurrentWallet("~Default");
 
                 // If -min option passed, start window minimized.
                 if(GetBoolArg("-min"))
@@ -276,7 +269,7 @@ int main(int argc, char *argv[])
                 }
 
                 // Now that initialization/startup is done, process any command-line
-                // bitcoin: URIs
+                // BctCoin: URIs
                 QObject::connect(paymentServer, SIGNAL(receivedURI(QString)), &window, SLOT(handleURI(QString)));
                 QTimer::singleShot(100, paymentServer, SLOT(uiReady()));
 
@@ -286,9 +279,8 @@ int main(int argc, char *argv[])
                 window.setClientModel(0);
                 window.removeAllWallets();
                 guiref = 0;
-                delete walletModel;
             }
-            // Shutdown the core and its threads, but don't exit Bitcoin-Qt here
+            // Shutdown the core and its threads, but don't exit BctCoin-Qt here
             threadGroup.interrupt_all();
             threadGroup.join_all();
             Shutdown();

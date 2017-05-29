@@ -18,7 +18,7 @@
 extern bool fTestNet;
 static inline unsigned short GetDefaultPort(const bool testnet = fTestNet)
 {
-    return testnet ? 19678 : 9678;
+    return testnet ? 12455 : 2455;
 }
 
 
@@ -69,7 +69,6 @@ class CMessageHeader
 enum
 {
     NODE_NETWORK = (1 << 0),
-    NODE_BLOOM = (1 << 1),
 };
 
 /** A CService with information about it as peer */

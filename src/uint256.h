@@ -395,6 +395,13 @@ public:
         s.read((char*)pn, sizeof(pn));
     }
 
+    std::vector<unsigned char> toVch()
+    {
+        std::vector<unsigned char> vch;
+        vch.resize(sizeof(pn));
+        memcpy(&vch[0], pn, sizeof(pn));
+        return vch;
+    }
 
     friend class uint160;
     friend class uint256;

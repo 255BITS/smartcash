@@ -1,7 +1,3 @@
-// Copyright (c) 2011-2014 The Bitcoin developers
-// Distributed under the MIT/X11 software license, see the accompanying
-// file COPYING or http://www.opensource.org/licenses/mit-license.php.
-
 #include "transactiondesc.h"
 
 #include "guiutil.h"
@@ -16,19 +12,17 @@
 
 QString TransactionDesc::FormatTxStatus(const CWalletTx& wtx)
 {
-    if (!wtx.IsFinal(nBestHeight + 1))
+    if (!wtx.IsFinal())
     {
         if (wtx.nLockTime < LOCKTIME_THRESHOLD)
-            return tr("Open for %n more block(s)", "", wtx.nLockTime - nBestHeight);
+            return tr("Open for %n more block(s)", "", wtx.nLockTime - nBestHeight + 1);
         else
             return tr("Open until %1").arg(GUIUtil::dateTimeStr(wtx.nLockTime));
     }
     else
     {
         int nDepth = wtx.GetDepthInMainChain();
-        if (nDepth < 0)
-            return tr("conflicted");
-        else if (GetAdjustedTime() - wtx.nTimeReceived > 2 * 60 && wtx.GetRequestCount() == 0)
+        if (GetAdjustedTime() - wtx.nTimeReceived > 2 * 60 && wtx.GetRequestCount() == 0)
             return tr("%1/offline").arg(nDepth);
         else if (nDepth < 6)
             return tr("%1/unconfirmed").arg(nDepth);
@@ -67,13 +61,15 @@ QString TransactionDesc::toHTML(CWallet *wallet, CWalletTx &wtx)
         //
         // From
         //
-        if (wtx.IsCoinBase() ||  wtx.IsZerocoinSpend())
+        if (wtx.IsCoinBase())
         {
+            
             strHTML += "<b>" + tr("Source") + ":</b> " + tr("Generated") + "<br>";
         }
         else if (wtx.mapValue.count("from") && !wtx.mapValue["from"].empty())
         {
             // Online transaction
+            
             strHTML += "<b>" + tr("From") + ":</b> " + GUIUtil::HtmlEscape(wtx.mapValue["from"]) + "<br>";
         }
         else
@@ -81,16 +77,21 @@ QString TransactionDesc::toHTML(CWallet *wallet, CWalletTx &wtx)
             // Offline transaction
             if (nNet > 0)
             {
+                
                 // Credit
                 BOOST_FOREACH(const CTxOut& txout, wtx.vout)
                 {
+                    
                     if (wallet->IsMine(txout))
                     {
+                        
                         CTxDestination address;
                         if (ExtractDestination(txout.scriptPubKey, address) && IsMine(*wallet, address))
                         {
+                            
                             if (wallet->mapAddressBook.count(address))
                             {
+                                // Why is this unknown?
                                 strHTML += "<b>" + tr("From") + ":</b> " + tr("unknown") + "<br>";
                                 strHTML += "<b>" + tr("To") + ":</b> ";
                                 strHTML += GUIUtil::HtmlEscape(CBitcoinAddress(address).ToString());
@@ -124,7 +125,7 @@ QString TransactionDesc::toHTML(CWallet *wallet, CWalletTx &wtx)
         //
         // Amount
         //
-        if ((wtx.IsCoinBase() || wtx.IsZerocoinSpend())&& nCredit == 0)
+        if (wtx.IsCoinBase() && nCredit == 0)
         {
             //
             // Coinbase

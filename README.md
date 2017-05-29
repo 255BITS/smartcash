@@ -1,36 +1,51 @@
-SmartCash
-================================
+Coin Specifications
 
-https://SmartCash.CC
+Only 5 Million Total Coins 
+50% Premined
+60 Seconds Block Time
+120 Blocks Transaction Confirmations
+Utilizes SHA3 Keccak Proof-Of-Work
+Difficulty Retargeted Based on KGW Every 4 Minutes
 
- Copyright (c) 2009 - 2016 Bitcoin Developers
- Copyright (c) 2015 - 2017 Zcoin Developers
- Copyright (c) 2017 - 2017 SmartCash Developers
+Block Information
 
-License
--------
+1-10 Blocks	2,50,000 Coins Per Block ( Premine )
 
-SmartCash is released under the terms of the MIT license. See `COPYING` for more
-information or see http://opensource.org/licenses/MIT.
+11-2000 Blocks 2 Coins Per Block to Control Mine Strom
 
-Development process
--------------------
+2001 - 100000 Blocks 9 Coins Per Block
 
-Developers work in their own trees, then submit pull requests when they think
-their feature or bug fix is ready.
+100001 - 200000 Blocks 7 Coins Per Block
 
-If it is a simple/trivial/non-controversial change, then one of the smartcash
-development team members simply pulls it.
+200001 - 300000 Blocks 6 Coins Per Block
 
-If it is a *more complicated or potentially controversial* change, then the patch
-submitter will be asked to start a discussion.
+300001 - 400000 Blocks 3 Coins Per Block
 
-The patch will be accepted if there is broad consensus that it is a good thing.
-Developers should expect to rework and resubmit patches if the code doesn't
-match the project's coding conventions (see `doc/coding.txt`) or are
-controversial.
+400001 - 414048   Blocks 1 Coin Per Block
 
-Installation
--------
 
-Please see details in Wiki section
+
+Config File
+
+
+BctCoin.conf
+
+
+Server=1
+
+Rpcuser=bctcoin
+
+Rpcpassword=bctcoin
+
+Rpcport=2456
+
+P2pport=2455
+
+Addnode= 208.167.233.222
+
+Addnode= 76.74.178.182
+
+Addnode= 69.90.132.171
+
+Addnode= 66.172.11.153
+

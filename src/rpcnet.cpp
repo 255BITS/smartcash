@@ -1,9 +1,12 @@
-// Copyright (c) 2009-2014 Bitcoin Developers
+// Copyright (c) 2009-2012 Bitcoin Developers
+// Copyright (c) 2014 BctCoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "net.h"
 #include "bitcoinrpc.h"
+#include "base58.h"
+#include "util.h"
 
 using namespace json_spirit;
 using namespace std;
@@ -48,12 +51,11 @@ Value getpeerinfo(const Array& params, bool fHelp)
         Object obj;
 
         obj.push_back(Pair("addr", stats.addrName));
-        obj.push_back(Pair("services", strprintf("%08" PRI64x, stats.nServices)));
+        obj.push_back(Pair("services", strprintf("%08"PRI64x, stats.nServices)));
         obj.push_back(Pair("lastsend", (boost::int64_t)stats.nLastSend));
         obj.push_back(Pair("lastrecv", (boost::int64_t)stats.nLastRecv));
         obj.push_back(Pair("bytessent", (boost::int64_t)stats.nSendBytes));
         obj.push_back(Pair("bytesrecv", (boost::int64_t)stats.nRecvBytes));
-        obj.push_back(Pair("blocksrequested", (boost::int64_t)stats.nBlocksRequested));
         obj.push_back(Pair("conntime", (boost::int64_t)stats.nTimeConnected));
         obj.push_back(Pair("version", stats.nVersion));
         // Use the sanitized form of subver here, to avoid tricksy remote peers from
@@ -147,17 +149,15 @@ Value getaddednodeinfo(const Array& params, bool fHelp)
             throw JSONRPCError(-24, "Error: Node has not been added.");
     }
 
-    Array ret;
     if (!fDns)
     {
+        Object ret;
         BOOST_FOREACH(string& strAddNode, laddedNodes)
-        {
-            Object obj;
-            obj.push_back(Pair("addednode", strAddNode));
-            ret.push_back(obj);
-        }
+            ret.push_back(Pair("addednode", strAddNode));
         return ret;
     }
+
+    Array ret;
 
     list<pair<string, vector<CService> > > laddedAddreses(0);
     BOOST_FOREACH(string& strAddNode, laddedNodes)
@@ -206,5 +206,42 @@ Value getaddednodeinfo(const Array& params, bool fHelp)
     }
 
     return ret;
+}
+
+// Ported from Primecoin
+Value makekeypair(const Array& params, bool fHelp)
+{
+    if (fHelp || params.size() > 1)
+        throw runtime_error(
+            "makekeypair [prefix]\n"
+            "Make a public/private key pair.\n"
+            "[prefix] is optional base64-encoded prefix for the public key.\n");
+
+    string strPrefix = "";
+    if (params.size() > 0)
+        strPrefix = params[0].get_str();
+
+    CKey key;
+    CPubKey pubKey;
+    std::vector<unsigned char> vchPubKey;
+    int nCount = 0;
+    do
+    {
+        key.MakeNewKey(false);
+        pubKey = key.GetPubKey();
+        vchPubKey = pubKey.Raw();
+        nCount++;
+    } while (nCount < 10000 && strPrefix != EncodeBase64(&vchPubKey[0], vchPubKey.size()).substr(0, strPrefix.size()));
+
+    if (strPrefix != EncodeBase64(&vchPubKey[0], vchPubKey.size()).substr(0, strPrefix.size()))
+        return Value::null;
+
+    bool isCompressed;
+    CSecret secretKey = key.GetSecret(isCompressed);
+
+    Object result;
+    result.push_back(Pair("PublicKey",  EncodeBase64(&vchPubKey[0], vchPubKey.size())));
+    result.push_back(Pair("PrivateKey", CBitcoinSecret(secretKey, isCompressed).ToString()));
+    return result;
 }
 
